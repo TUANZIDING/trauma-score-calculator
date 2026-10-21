@@ -103,7 +103,7 @@ footer{font-size:12px;color:var(--mut);text-align:center;padding:18px}
 </head>
 <body>
 <header>
-  <h1>创伤评分计算器<small>v3.1</small></h1>
+  <h1>创伤评分计算器<small>v3.2</small></h1>
   <div class="disc">结果仅供临床参考与教学，AIS 以官方手册为准；TRISS 系数来自美国 MTOS 数据，未在中国人群校准。</div>
 </header>
 <main>
@@ -186,7 +186,7 @@ footer{font-size:12px;color:var(--mut);text-align:center;padding:18px}
 
   <div class="card" id="resCard">
     <h2>结果</h2>
-    <div id="resBody"></div>
+    <div id="resBody"><div class="warn" id="noJs">结果区需要 JavaScript。如果这里一直空白，说明当前查看器（如 App 内预览、“文件”预览）禁止运行脚本，请用 Safari 或 Chrome 打开本文件或在线版。</div></div>
     <div class="row noprint" style="margin-top:10px"><button id="btnCopy">复制结果</button><button class="sec" id="btnPrint">打印 / 存为 PDF</button><span id="copyMsg" class="hint"></span></div>
   </div>
 
