@@ -1,0 +1,124 @@
+  <div id="lesson" class="hidden">
+  <div class="card lesson-hero">
+    <h2>📘 评分小课堂</h2>
+    <p>一句话记住：<b>ISS 看“伤得多重”，RTS 看“现在多危险”，TRISS 把两者加上年龄，算出“活下来的概率”。</b></p>
+    <div class="chips"><a href="#l-concept">先分清几种“伤”</a><a href="#l-iss">ISS</a><a href="#l-niss">NISS</a><a href="#l-gcs">GCS</a><a href="#l-rts">RTS</a><a href="#l-triss">TRISS</a><a href="#l-si">休克指数</a><a href="#l-quiz">小测</a><a href="#l-case">病例挑战</a><a href="#l-family">院前评分家族</a></div>
+  </div>
+
+  <div class="card lesson" id="l-concept">
+    <h2>🧩 先分清几种“伤”</h2>
+    <div class="grid2">
+      <div class="tile"><b>多发伤</b><span>一个致伤因素，伤了 ≥2 个解剖部位，且至少一处危及生命。<i>就像一场车祸，脑和胸同时“报警”。</i></span></div>
+      <div class="tile"><b>复合伤</b><span>两种以上致伤因素同时或先后作用，例如冲击伤合并烧伤。<i>不是伤得多，而是“凶手”多。</i></span></div>
+      <div class="tile"><b>联合伤</b><span>同一致伤因素造成相邻两个部位的连续损伤，如胸腹联合伤。<i>一刀穿过“两个房间的墙”。</i></span></div>
+      <div class="tile"><b>合并伤</b><span>主要的重伤以外，其他部位还有较轻的伤，如重型颅脑伤合并肋骨骨折。<i>有主角，也有配角。</i></span></div>
+    </div>
+    <p class="hint">为什么要先分清？ISS 是按“身体区域”算账的，多发伤正是 ISS 最常用的场景。</p>
+  </div>
+
+  <div class="card lesson" id="l-iss">
+    <h2>🏙️ ISS：每个街区只派一名“代表”</h2>
+    <p class="analogy">把身体想成 6 个街区：头颈、面、胸、腹、四肢及骨盆、体表。每个街区只派出<b>伤得最重的那一处</b>作为代表，再从中挑出<b>最重的 3 个街区</b>，把它们的 AIS 各自平方后相加。</p>
+    <div class="formula">ISS = A² + B² + C²　（A、B、C 来自 3 个<u>不同</u>区域）</div>
+    <div class="why"><b>为什么要平方？</b>AIS 3 和 AIS 5 只差 2 分，死亡风险却差很多。平方把重伤“放大”，让分数更接近真实的风险曲线。</div>
+    <div class="example"><b>动手算：</b>头颈 4、头颈 3、胸 3、四肢 3<br>头颈派出代表 4（那处 3 被“替下”）→ 4² + 3² + 3² = 16 + 9 + 9 = <b>34</b></div>
+    <ul class="pit">
+      <li>❌ 同一区域的两处伤不能都计入 ISS，这是网上部分计算器的漏洞。</li>
+      <li>❌ 任一处 AIS 6 时，ISS 直接记 75，不再相加。</li>
+      <li>❌ AIS 9（不详）不参与计算，ISS 可能因此被低估。</li>
+      <li>💡 ISS 只可能取部分数值：7、15、23 等永远算不出来。如果病历上写着 ISS = 15，一定是算错了。</li>
+      <li>💡 ISS ≥16 是 AIS 98 时代的“严重创伤”界值；换用 AIS 2008 或 2015 后，等效界值约降到 12 左右。</li>
+    </ul>
+  </div>
+
+  <div class="card lesson" id="l-niss">
+    <h2>🔥 NISS：不分街区，只看最重的 3 处伤</h2>
+    <p class="analogy">ISS 有个盲点：如果头部有两处都很重，只有一处能当“代表”。NISS 不管区域，直接取全身最重的 3 处损伤。</p>
+    <div class="example"><b>动手算：</b>头颈 4、头颈 4、胸 2<br>ISS = 4² + 2² = <b>20</b>　NISS = 4² + 4² + 2² = <b>36</b></div>
+    <div class="why"><b>临床意义：</b>颅脑损伤、多发穿透伤这类“伤集中在一个区域”的患者，NISS 往往比 ISS 更能反映真实严重度。两者差距越大，越要看看是不是“一个区域扛了所有伤”。</div>
+  </div>
+
+  <div class="card lesson" id="l-gcs">
+    <h2>🧠 GCS：给大脑打的“三门课”成绩</h2>
+    <div class="grid3">
+      <div class="tile"><b>E 睁眼 1–4</b><span>叫他会不会睁眼</span></div>
+      <div class="tile"><b>V 语言 1–5</b><span>说的话是否切题</span></div>
+      <div class="tile"><b>M 运动 1–6</b><span>能不能听指令动作</span></div>
+    </div>
+    <div class="scale"><span class="s1">13–15 轻度</span><span class="s2">9–12 中度</span><span class="s3">≤8 重度（“8 分插管”）</span></div>
+    <ul class="pit">
+      <li>💡 M 分最“值钱”：预测预后时，运动评分的分量最重。</li>
+      <li>❌ 插管患者 V 无法评估，不要随手记 1 分了事。本工具会要求你选择处理方式（Meredith 推算、记 1 或不计算），并在结果上标注“非标准 GCS”。</li>
+      <li>💡 最低分是 3 分，不是 0 分。</li>
+    </ul>
+  </div>
+
+  <div class="card lesson" id="l-rts">
+    <h2>🚦 RTS：生命的三盏灯（意识、血压、呼吸）</h2>
+    <p class="analogy">每盏灯分 0–4 档，4 档是绿灯，0 档是熄灭。</p>
+    <table class="mini"><tr><th>编码</th><th>GCS</th><th>SBP</th><th>RR</th></tr>
+      <tr><td>4</td><td>13–15</td><td>≥90</td><td>10–29</td></tr>
+      <tr><td>3</td><td>9–12</td><td>76–89</td><td>≥30</td></tr>
+      <tr><td>2</td><td>6–8</td><td>50–75</td><td>6–9</td></tr>
+      <tr><td>1</td><td>4–5</td><td>1–49</td><td>1–5</td></tr>
+      <tr><td>0</td><td>3</td><td>0</td><td>0</td></tr></table>
+    <div class="formula">加权 RTS = 0.9368×GCS编码 + 0.7326×SBP编码 + 0.2908×RR编码（0–7.8408）</div>
+    <div class="why"><b>两个 RTS，用途不同：</b>T-RTS 是三项编码直接相加（0–12），用在现场分诊；加权 RTS 带权重，用于 TRISS。<b>权重说明意识最重要</b>：GCS 的权重是 RR 的三倍多。</div>
+    <ul class="pit"><li>❌ 呼吸快到 30 次/分以上反而降一档（RR ≥30 → 3），不是越快越好。</li><li>❌ SBP 90 属于 4 档；有的网站把 90 漏掉了。</li><li>❌ 不要把 T-RTS（比如 12）当作加权 RTS 填进 TRISS。</li></ul>
+  </div>
+
+  <div class="card lesson" id="l-triss">
+    <h2>🌦️ TRISS：创伤界的“天气预报”</h2>
+    <p class="analogy">天气预报说“降雨概率 30%”，不代表今天一定不下雨。TRISS 给出的 Ps 也是一样：<b>同类患者 100 人中大约多少人会活下来</b>，不是对这一个人的判决。</p>
+    <div class="formula">b = b0 + b1×RTS + b2×ISS + b3×年龄指数（≥55 岁 = 1）　　Ps = 1 / (1 + e<sup>−b</sup>)</div>
+    <div class="why"><b>三个“配料”：</b>RTS（现在多危险）＋ ISS（解剖上伤多重）＋ 年龄（身体底子）。钝性伤和穿透伤用两套不同的系数。</div>
+    <ul class="pit">
+      <li>💡 系数有好几个版本（1987、1995 等），同一患者的 Ps 可能差 15% 以上。<b>写论文时一定要注明版本。</b></li>
+      <li>💡 <15 岁的穿透伤，经典做法是按钝性系数计算。</li>
+      <li>💡 Ps <0.5 却活下来的叫“意外存活”，Ps >0.5 却死亡的叫“意外死亡”。它们是<b>需要同行评议的病例</b>，不能直接当作结论。</li>
+      <li>❌ 系数来自美国数据，没有在中国人群校准过；老年人、烧伤、溺水患者也不适用。</li>
+    </ul>
+  </div>
+
+  <div class="card lesson" id="l-si">
+    <h2>💓 休克指数：心脏在“加班”吗？</h2>
+    <p class="analogy">SI = 心率 ÷ 收缩压。血压还撑得住，心率却越来越快，说明心脏在拼命加班。SI 往往比单看血压更早报警。</p>
+    <div class="scale"><span class="s1">0.5–0.8 正常</span><span class="s2">≥1.0 警惕休克</span><span class="s3">越大，失血越多</span></div>
+    <ul class="pit"><li>💡 年龄休克指数 = 年龄 × SI，≥50 提示风险，但在老年人中容易“过度报警”。</li><li>❌ 服用 β 受体阻滞剂、装有起搏器的患者心率受限，SI 可能“假正常”。</li></ul>
+  </div>
+
+  <div class="card lesson" id="l-quiz">
+    <h2>✍️ 小测：点开看答案</h2>
+    <details><summary>1. 头颈部两处 AIS 4，胸部 AIS 2。ISS 和 NISS 各是多少？</summary><p>ISS = 4² + 2² = <b>20</b>；NISS = 4² + 4² + 2² = <b>36</b>。同一区域只能派出一名代表。</p></details>
+    <details><summary>2. SBP 90 mmHg 编码几分？89 呢？</summary><p>90 → <b>4</b>；89 → <b>3</b>。边界值最容易算错。</p></details>
+    <details><summary>3. 病历上写着“ISS = 15”，可能吗？</summary><p><b>不可能。</b>15 无法写成三个 0–5 的平方之和，一定是算错了。</p></details>
+    <details><summary>4. 能把 T-RTS = 12 直接填进 TRISS 吗？</summary><p><b>不能。</b>TRISS 要用加权 RTS（最高 7.8408）。</p></details>
+    <details><summary>5. 一名患者 Ps = 25%，最后康复出院。这说明什么？</summary><p>这是“意外存活”，值得做病例讨论，看看救治中哪里做得好。但它<b>不能单独证明</b>医疗质量；TRISS 本身也会出错（例如 AIS 录入错误、系数不适用）。</p></details>
+    <details><summary>6. GCS 已插管患者，V 应该怎么记？</summary><p>没有统一标准。可以用 Meredith 公式推算、记 1，或者不计算 RTS；关键是<b>注明你用了哪种方法</b>。</p></details>
+  </div>
+
+  <div class="card lesson" id="l-case">
+    <h2>🚑 病例挑战</h2>
+    <p class="hint">题中的 AIS 值是教学设定，实际编码以 AAAM 手册为准。点“开始练习”会把标准答案载入评分者 B，并清空 A，由你在 A 栏自己录入。</p>
+    <div class="case"><b>病例 1｜清晨的电动车</b><p>72 岁老人骑电动车被小货车侧撞。来院时能睁眼、对答尚可，GCS 13，SBP 100，RR 22，HR 96。题设 AIS：头颈 4、头颈 3、胸 3、腹 2、四肢 3，钝性伤。</p>
+      <button class="sec" data-case="1">开始练习</button>
+      <details><summary>看答案</summary><p>ISS = 4² + 3² + 3² = <b>34</b>（腹部 2 落选）；NISS = <b>34</b>；RTS = <b>7.8408</b>；年龄指数 1；TRISS Ps ≈ <b>78.7%</b>。生理指标“看着还行”，但高龄加上 ISS 34 把生存概率拉了下来。</p></details></div>
+    <div class="case"><b>病例 2｜三楼坠落</b><p>35 岁工人从三楼坠落，GCS 7，SBP 110，RR 12，HR 88。题设 AIS：头颈 4、头颈 4、胸 2，钝性伤。</p>
+      <button class="sec" data-case="2">开始练习</button>
+      <details><summary>看答案</summary><p>ISS = 4² + 2² = <b>20</b>；NISS = <b>36</b>；RTS = 0.9368×2 + 0.7326×4 + 0.2908×4 = <b>5.9672</b>；TRISS Ps ≈ <b>93.7%</b>。这是典型的“伤集中在头部，ISS 低估、NISS 更真实”的例子。</p></details></div>
+    <div class="case"><b>病例 3｜深夜的刀</b><p>28 岁男性腹部刀刺伤，神志清楚（GCS 15），SBP 70，RR 30，HR 118。题设 AIS：腹 4、胸 3、体表 1，穿透伤。</p>
+      <button class="sec" data-case="3">开始练习</button>
+      <details><summary>看答案</summary><p>ISS = 4² + 3² + 1² = <b>26</b>；RTS = 0.9368×4 + 0.7326×2 + 0.2908×3 = <b>6.0848</b>；TRISS（穿透）Ps ≈ <b>86.0%</b>；SI = 118/70 ≈ <b>1.69</b>。神志清楚不等于安全：SI 已经在拉响休克警报。</p></details></div>
+  </div>
+
+  <div class="card lesson" id="l-family">
+    <h2>🗂️ 延伸：院前评分家族（本工具暂不计算）</h2>
+    <table class="mini"><tr><th>评分</th><th>看什么</th><th>记住这个数</th></tr>
+      <tr><td>创伤指数 TI</td><td>部位、伤型、循环、呼吸、意识</td><td>≥10 分送创伤中心；≥17 极重度</td></tr>
+      <tr><td>创伤评分 TS</td><td>呼吸、呼吸幅度、SBP、毛细血管充盈、GCS</td><td>1–16 分，≤12 分送创伤中心</td></tr>
+      <tr><td>CRAMS</td><td>循环、呼吸、腹部、运动、语言</td><td>≤6 极重度，7–8 重度</td></tr>
+      <tr><td>院前指数 PHI</td><td>SBP、脉搏、呼吸、意识</td><td>4–20 重伤；胸腹穿透伤 +4</td></tr>
+      <tr><td>类选对照表 TC</td><td>7 条“一票送院”标准</td><td>满足任一条即送创伤中心</td></tr></table>
+    <p class="hint">一句话区分：<b>院前评分求快</b>（几秒钟分拣），<b>ISS/TRISS 求准</b>（明确诊断后回顾评估）。国家创伤质控指标要求完成 GCS、TI、ISS 评分。资料来源：微信公众号《创伤中常见基本概念》及本工具参考文献。</p>
+  </div>
+  </div>

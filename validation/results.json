@@ -1,0 +1,815 @@
+{
+ "datasets": [
+  {
+   "name": "TITCO-I",
+   "n": 14755,
+   "deaths": 3055,
+   "population_note": "primary: burns excluded; DAMA kept as survivors; 1 row missing outcome dropped",
+   "n_total_with_outcome": 15999,
+   "deaths_total": 3638,
+   "iss_agreement": {
+    "n": 13602,
+    "exact_pct": 99.99,
+    "within1_pct": 99.99,
+    "niss_exact_pct": 99.98,
+    "all_incl_burns_n": 14811,
+    "all_incl_burns_iss_exact_pct": 99.99,
+    "rows_with_any_region_code": 13602,
+    "recorded_iss_missing": 1153,
+    "mismatch_examples_diff_distribution": {
+     "-5": 2
+    }
+   },
+   "metrics": {
+    "ISS": {
+     "n": 13602,
+     "deaths": 2768,
+     "auc": 0.609,
+     "ci": [
+      0.598,
+      0.621
+     ]
+    },
+    "ISS_recomputed": {
+     "n": 13602,
+     "deaths": 2768,
+     "auc": 0.609,
+     "ci": [
+      0.598,
+      0.621
+     ]
+    },
+    "NISS": {
+     "n": 13602,
+     "deaths": 2768,
+     "auc": 0.638,
+     "ci": [
+      0.626,
+      0.65
+     ]
+    },
+    "RTS": {
+     "n": 8267,
+     "deaths": 1639,
+     "auc": 0.832,
+     "ci": [
+      0.82,
+      0.844
+     ]
+    },
+    "T-RTS": {
+     "n": 8267,
+     "deaths": 1639,
+     "auc": 0.832,
+     "ci": [
+      0.82,
+      0.844
+     ]
+    },
+    "SI": {
+     "n": 11862,
+     "deaths": 2405,
+     "auc": 0.579,
+     "ci": [
+      0.565,
+      0.592
+     ]
+    },
+    "AgeSI": {
+     "n": 11862,
+     "deaths": 2405,
+     "auc": 0.653,
+     "ci": [
+      0.641,
+      0.665
+     ]
+    },
+    "TRISS_Ps": {
+     "n": 7777,
+     "deaths": 1479,
+     "auc": 0.83,
+     "ci": [
+      0.818,
+      0.842
+     ]
+    },
+    "common_complete_case": {
+     "n": 7662,
+     "deaths": 1386,
+     "ISS": 0.616,
+     "NISS": 0.645,
+     "RTS": 0.814,
+     "SI": 0.594,
+     "TRISS": 0.821
+    },
+    "TRISS_calibration": {
+     "n": 7777,
+     "deaths": 1479,
+     "brier": 0.1471,
+     "calibration_in_the_large": 2.136,
+     "calibration_in_the_large_ci": [
+      2.068,
+      2.204
+     ],
+     "calibration_slope": 0.951,
+     "calibration_slope_ci": [
+      0.899,
+      1.002
+     ],
+     "expected_deaths": 383.0,
+     "observed_deaths": 1479,
+     "W": -14.09,
+     "Z": -67.35,
+     "deciles": [
+      {
+       "decile": 1,
+       "n": 970,
+       "pred_mort": 0.4,
+       "obs_mort": 2.9
+      },
+      {
+       "decile": 2,
+       "n": 1190,
+       "pred_mort": 0.6,
+       "obs_mort": 5.1
+      },
+      {
+       "decile": 3,
+       "n": 570,
+       "pred_mort": 0.6,
+       "obs_mort": 2.8
+      },
+      {
+       "decile": 4,
+       "n": 408,
+       "pred_mort": 0.8,
+       "obs_mort": 6.6
+      },
+      {
+       "decile": 5,
+       "n": 950,
+       "pred_mort": 1.1,
+       "obs_mort": 9.5
+      },
+      {
+       "decile": 6,
+       "n": 581,
+       "pred_mort": 1.5,
+       "obs_mort": 10.7
+      },
+      {
+       "decile": 7,
+       "n": 894,
+       "pred_mort": 2.4,
+       "obs_mort": 21.6
+      },
+      {
+       "decile": 8,
+       "n": 679,
+       "pred_mort": 3.8,
+       "obs_mort": 19.4
+      },
+      {
+       "decile": 9,
+       "n": 789,
+       "pred_mort": 7.7,
+       "obs_mort": 43.3
+      },
+      {
+       "decile": 10,
+       "n": 746,
+       "pred_mort": 32.1,
+       "obs_mort": 70.8
+      }
+     ]
+    },
+    "TRISS_by_mech": {
+     "blunt": {
+      "n": 7281,
+      "deaths": 1445,
+      "auc": 0.826,
+      "ci": [
+       0.813,
+       0.838
+      ]
+     },
+     "penetrating": {
+      "n": 496,
+      "deaths": 34,
+      "auc": 0.871,
+      "ci": [
+       0.8,
+       0.942
+      ]
+     }
+    }
+   },
+   "sensitivity": {
+    "include_burns": {
+     "ISS": {
+      "n": 14811,
+      "deaths": 3336,
+      "auc": 0.659,
+      "ci": [
+       0.649,
+       0.67
+      ]
+     },
+     "NISS": {
+      "n": 14811,
+      "deaths": 3336,
+      "auc": 0.673,
+      "ci": [
+       0.663,
+       0.684
+      ]
+     },
+     "RTS": {
+      "n": 8485,
+      "deaths": 1745,
+      "auc": 0.812,
+      "ci": [
+       0.8,
+       0.824
+      ]
+     },
+     "TRISS_Ps": {
+      "n": 7993,
+      "deaths": 1584,
+      "auc": 0.827,
+      "ci": [
+       0.815,
+       0.838
+      ]
+     },
+     "TRISS_calibration": {
+      "n": 7993,
+      "deaths": 1584,
+      "brier": 0.1532,
+      "calibration_in_the_large": 2.201,
+      "calibration_in_the_large_ci": [
+       2.135,
+       2.267
+      ],
+      "calibration_slope": 0.938,
+      "calibration_slope_ci": [
+       0.888,
+       0.987
+      ],
+      "expected_deaths": 402.8,
+      "observed_deaths": 1584,
+      "W": -14.78,
+      "Z": -71.48
+     }
+    },
+    "exclude_DAMA": {
+     "ISS": {
+      "n": 12626,
+      "deaths": 2767,
+      "auc": 0.607,
+      "ci": [
+       0.596,
+       0.619
+      ]
+     },
+     "NISS": {
+      "n": 12626,
+      "deaths": 2767,
+      "auc": 0.637,
+      "ci": [
+       0.625,
+       0.649
+      ]
+     },
+     "RTS": {
+      "n": 7877,
+      "deaths": 1638,
+      "auc": 0.836,
+      "ci": [
+       0.824,
+       0.847
+      ]
+     },
+     "TRISS_Ps": {
+      "n": 7420,
+      "deaths": 1478,
+      "auc": 0.834,
+      "ci": [
+       0.822,
+       0.846
+      ]
+     },
+     "TRISS_calibration": {
+      "n": 7420,
+      "deaths": 1478,
+      "brier": 0.1536,
+      "calibration_in_the_large": 2.22,
+      "calibration_in_the_large_ci": [
+       2.152,
+       2.289
+      ],
+      "calibration_slope": 0.98,
+      "calibration_slope_ci": [
+       0.927,
+       1.033
+      ],
+      "expected_deaths": 368.0,
+      "observed_deaths": 1478,
+      "W": -14.96,
+      "Z": -69.77
+     }
+    }
+   },
+   "tiers": {
+    "mode": "full",
+    "n": 14755,
+    "tiers": [
+     {
+      "tier": "Red",
+      "n": 5506,
+      "deaths": 2301,
+      "mortality_pct": 41.8
+     },
+     {
+      "tier": "Orange",
+      "n": 4173,
+      "deaths": 484,
+      "mortality_pct": 11.6
+     },
+     {
+      "tier": "Yellow",
+      "n": 2940,
+      "deaths": 161,
+      "mortality_pct": 5.5
+     },
+     {
+      "tier": "Green",
+      "n": 2136,
+      "deaths": 109,
+      "mortality_pct": 5.1
+     }
+    ],
+    "red_for_death": {
+     "sens": 0.753,
+     "spec": 0.726,
+     "ppv": 0.418,
+     "npv": 0.918,
+     "tp": 2301,
+     "fp": 3205,
+     "fn": 754,
+     "tn": 8495
+    },
+    "red_criteria": [
+     {
+      "criterion": "GCS<=8",
+      "n_met": 3446,
+      "missing": 1172,
+      "mortality_pct": 56.1,
+      "deaths_captured": 1934,
+      "sole_trigger_n": 2084,
+      "sole_trigger_deaths": 1038
+     },
+     {
+      "criterion": "SBP<90",
+      "n_met": 876,
+      "missing": 2615,
+      "mortality_pct": 51.5,
+      "deaths_captured": 451,
+      "sole_trigger_n": 62,
+      "sole_trigger_deaths": 26
+     },
+     {
+      "criterion": "SI>=1.0",
+      "n_met": 2273,
+      "missing": 2893,
+      "mortality_pct": 30.9,
+      "deaths_captured": 702,
+      "sole_trigger_n": 976,
+      "sole_trigger_deaths": 99
+     },
+     {
+      "criterion": "RR<10",
+      "n_met": 255,
+      "missing": 6084,
+      "mortality_pct": 90.2,
+      "deaths_captured": 230,
+      "sole_trigger_n": 8,
+      "sole_trigger_deaths": 3
+     },
+     {
+      "criterion": "RR>29",
+      "n_met": 167,
+      "missing": 6084,
+      "mortality_pct": 41.3,
+      "deaths_captured": 69,
+      "sole_trigger_n": 55,
+      "sole_trigger_deaths": 12
+     },
+     {
+      "criterion": "ISS>=25",
+      "n_met": 955,
+      "missing": 1153,
+      "mortality_pct": 40.4,
+      "deaths_captured": 386,
+      "sole_trigger_n": 429,
+      "sole_trigger_deaths": 84
+     },
+     {
+      "criterion": "Ps<0.5",
+      "n_met": 136,
+      "missing": 6978,
+      "mortality_pct": 89.0,
+      "deaths_captured": 121,
+      "sole_trigger_n": 0,
+      "sole_trigger_deaths": 0
+     }
+    ],
+    "orange_criteria": [
+     {
+      "criterion": "ISS16-24",
+      "n_met": 1872,
+      "mortality_pct": 27.1
+     },
+     {
+      "criterion": "GCS9-12",
+      "n_met": 1982,
+      "mortality_pct": 18.4
+     },
+     {
+      "criterion": "0.8<=SI<1.0",
+      "n_met": 3129,
+      "mortality_pct": 20.6
+     },
+     {
+      "criterion": "0.5<=Ps<0.9",
+      "n_met": 738,
+      "mortality_pct": 65.7
+     },
+     {
+      "criterion": "age>=65&ISS>=9",
+      "n_met": 700,
+      "mortality_pct": 40.1
+     }
+    ]
+   }
+  },
+  {
+   "name": "CRASH-2",
+   "n": 20207,
+   "deaths": 3086,
+   "metrics": {
+    "RTS": {
+     "n": 19748,
+     "deaths": 2883,
+     "auc": 0.808,
+     "ci": [
+      0.799,
+      0.817
+     ]
+    },
+    "T-RTS": {
+     "n": 19748,
+     "deaths": 2883,
+     "auc": 0.804,
+     "ci": [
+      0.795,
+      0.813
+     ]
+    },
+    "SI": {
+     "n": 19795,
+     "deaths": 2912,
+     "auc": 0.627,
+     "ci": [
+      0.615,
+      0.639
+     ]
+    },
+    "AgeSI": {
+     "n": 19792,
+     "deaths": 2912,
+     "auc": 0.637,
+     "ci": [
+      0.625,
+      0.648
+     ]
+    },
+    "GCS": {
+     "n": 20184,
+     "deaths": 3082,
+     "auc": 0.774,
+     "ci": [
+      0.764,
+      0.784
+     ]
+    },
+    "SBP": {
+     "n": 19887,
+     "deaths": 2952,
+     "auc": 0.631,
+     "ci": [
+      0.619,
+      0.643
+     ]
+    }
+   },
+   "tiers": {
+    "mode": "phys",
+    "n": 20207,
+    "tiers": [
+     {
+      "tier": "Red",
+      "n": 14450,
+      "deaths": 2848,
+      "mortality_pct": 19.7
+     },
+     {
+      "tier": "Orange",
+      "n": 2952,
+      "deaths": 139,
+      "mortality_pct": 4.7
+     },
+     {
+      "tier": "Yellow",
+      "n": 0,
+      "deaths": 0,
+      "mortality_pct": null
+     },
+     {
+      "tier": "Green",
+      "n": 2805,
+      "deaths": 99,
+      "mortality_pct": 3.5
+     }
+    ],
+    "red_for_death": {
+     "sens": 0.923,
+     "spec": 0.322,
+     "ppv": 0.197,
+     "npv": 0.959,
+     "tp": 2848,
+     "fp": 11602,
+     "fn": 238,
+     "tn": 5519
+    },
+    "red_criteria": [
+     {
+      "criterion": "GCS<=8",
+      "n_met": 3638,
+      "missing": 23,
+      "mortality_pct": 45.6,
+      "deaths_captured": 1659,
+      "sole_trigger_n": 1154,
+      "sole_trigger_deaths": 410
+     },
+     {
+      "criterion": "SBP<90",
+      "n_met": 6195,
+      "missing": 320,
+      "mortality_pct": 24.4,
+      "deaths_captured": 1510,
+      "sole_trigger_n": 280,
+      "sole_trigger_deaths": 64
+     },
+     {
+      "criterion": "SI>=1.0",
+      "n_met": 12150,
+      "missing": 412,
+      "mortality_pct": 17.4,
+      "deaths_captured": 2109,
+      "sole_trigger_n": 4686,
+      "sole_trigger_deaths": 265
+     },
+     {
+      "criterion": "RR<10",
+      "n_met": 305,
+      "missing": 191,
+      "mortality_pct": 48.2,
+      "deaths_captured": 147,
+      "sole_trigger_n": 16,
+      "sole_trigger_deaths": 3
+     },
+     {
+      "criterion": "RR>29",
+      "n_met": 2920,
+      "missing": 191,
+      "mortality_pct": 27.2,
+      "deaths_captured": 794,
+      "sole_trigger_n": 493,
+      "sole_trigger_deaths": 73
+     }
+    ],
+    "orange_criteria": [
+     {
+      "criterion": "GCS9-12",
+      "n_met": 2704,
+      "mortality_pct": 17.3
+     },
+     {
+      "criterion": "0.8<=SI<1.0",
+      "n_met": 3417,
+      "mortality_pct": 9.2
+     }
+    ]
+   }
+  },
+  {
+   "name": "UVA",
+   "n": 18680,
+   "deaths": 876,
+   "metrics": {
+    "ISS": {
+     "n": 18643,
+     "deaths": 872,
+     "auc": 0.821,
+     "ci": [
+      0.806,
+      0.837
+     ]
+    },
+    "NISS": {
+     "n": 18634,
+     "deaths": 872,
+     "auc": 0.817,
+     "ci": [
+      0.801,
+      0.833
+     ]
+    },
+    "registry_TRISS_pos": {
+     "n": 16452,
+     "deaths": 753,
+     "auc": 0.921,
+     "ci": [
+      0.912,
+      0.93
+     ]
+    },
+    "MGAP": {
+     "n": 17570,
+     "deaths": 799,
+     "auc": 0.898,
+     "ci": [
+      0.888,
+      0.909
+     ]
+    },
+    "recomputed_ISS": "not possible: no AIS/region columns in dataset"
+   },
+   "tiers": {
+    "mode": "iss",
+    "n": 18680,
+    "tiers": [
+     {
+      "tier": "Red",
+      "n": 1434,
+      "deaths": 481,
+      "mortality_pct": 33.5
+     },
+     {
+      "tier": "Orange",
+      "n": 2923,
+      "deaths": 148,
+      "mortality_pct": 5.1
+     },
+     {
+      "tier": "Yellow",
+      "n": 6796,
+      "deaths": 177,
+      "mortality_pct": 2.6
+     },
+     {
+      "tier": "Green",
+      "n": 7527,
+      "deaths": 70,
+      "mortality_pct": 0.9
+     }
+    ],
+    "red_for_death": {
+     "sens": 0.549,
+     "spec": 0.946,
+     "ppv": 0.335,
+     "npv": 0.977,
+     "tp": 481,
+     "fp": 953,
+     "fn": 395,
+     "tn": 16851
+    },
+    "red_criteria": [
+     {
+      "criterion": "ISS>=25",
+      "n_met": 1434,
+      "missing": 37,
+      "mortality_pct": 33.5,
+      "deaths_captured": 481,
+      "sole_trigger_n": 1434,
+      "sole_trigger_deaths": 481
+     }
+    ],
+    "orange_criteria": [
+     {
+      "criterion": "ISS16-24",
+      "n_met": 2923,
+      "mortality_pct": 5.1
+     }
+    ]
+   }
+  }
+ ],
+ "implementation_check": {
+  "traumar_version": "1.2.7",
+  "n": 1000,
+  "max_abs_diff_pedsRule_off": 2.22e-16,
+  "max_abs_diff_pedsRule_on": 0.365,
+  "n_diff_gt_1e-9_pedsRule_on": 74
+ },
+ "tiers_v3": {
+  "titco": {
+   "n": 14755,
+   "tiers": {
+    "red": {
+     "n": 5019,
+     "deaths": 2321,
+     "mort": 46.2
+    },
+    "orange": {
+     "n": 4769,
+     "deaths": 494,
+     "mort": 10.4
+    },
+    "yellow": {
+     "n": 2973,
+     "deaths": 140,
+     "mort": 4.7
+    },
+    "green": {
+     "n": 1994,
+     "deaths": 100,
+     "mort": 5
+    }
+   },
+   "red_sens": 0.76,
+   "red_spec": 0.769,
+   "red_ppv": 0.462,
+   "red_npv": 0.925
+  },
+  "crash2": {
+   "n": 20207,
+   "tiers": {
+    "red": {
+     "n": 10269,
+     "deaths": 2651,
+     "mort": 25.8
+    },
+    "orange": {
+     "n": 5045,
+     "deaths": 293,
+     "mort": 5.8
+    },
+    "yellow": {
+     "n": 3206,
+     "deaths": 106,
+     "mort": 3.3
+    },
+    "green": {
+     "n": 1687,
+     "deaths": 36,
+     "mort": 2.1
+    }
+   },
+   "red_sens": 0.859,
+   "red_spec": 0.555,
+   "red_ppv": 0.258,
+   "red_npv": 0.956
+  },
+  "uva": {
+   "n": 18680,
+   "tiers": {
+    "red": {
+     "n": 1434,
+     "deaths": 481,
+     "mort": 33.5
+    },
+    "orange": {
+     "n": 4846,
+     "deaths": 208,
+     "mort": 4.3
+    },
+    "yellow": {
+     "n": 5613,
+     "deaths": 123,
+     "mort": 2.2
+    },
+    "green": {
+     "n": 6787,
+     "deaths": 64,
+     "mort": 0.9
+    }
+   },
+   "red_sens": 0.549,
+   "red_spec": 0.946,
+   "red_ppv": 0.335,
+   "red_npv": 0.977
+  }
+ }
+}

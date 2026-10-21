@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#f3f7f8">
+<title>创伤评分计算器 v3（ISS / NISS / RTS / TRISS）</title>
+<style>
+:root{--bg:#f3f7f8;--card:#ffffff;--fg:#0f172a;--mut:#64748b;--line:#e5e8ee;--pri:#0f4c5c;--pri-ink:#0b3a46;--pri2:#eef4f6;--acc:#c89b3c;
+--warn:#9a5b00;--warnbg:#fdf6e8;--bad:#b42318;--badbg:#fdf0ef;--ok:#16794a;--okbg:#ecf7f1;--hl:#fff3c4;
+--red:#c0262d;--orange:#d9661f;--yellow:#c99a06;--green:#2f8f5b;--shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06);--r:16px}
+*{box-sizing:border-box}
+html{color-scheme:light only;background:#f3f7f8}
+body{margin:0;background:radial-gradient(1200px 500px at 50% -120px,#dcebef 0%,rgba(220,235,239,0) 70%),linear-gradient(180deg,#f6f9fa 0%,#f1f5f6 100%);background-attachment:fixed;min-height:100vh;color:var(--fg);font:15.5px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(135deg,rgba(18,92,108,.97),rgba(15,76,92,.97) 60%,rgba(28,104,118,.97));box-shadow:0 4px 18px rgba(15,76,92,.18);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);color:#fff;padding:12px 16px;border-bottom:2px solid var(--acc)}
+header h1{margin:0;font-size:17px;font-weight:650;letter-spacing:.3px}
+header h1 small{font-weight:500;opacity:.75;margin-left:6px;font-size:12px;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:1px 8px}
+.disc{font-size:12px;opacity:.85;margin-top:3px}
+main{max-width:880px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:14px 0;box-shadow:var(--shadow)}
+.card h2{font-size:15px;margin:0 0 12px;color:var(--fg);font-weight:650;display:flex;align-items:center;gap:8px}
+.card h2::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--acc)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label{font-size:13.5px;color:var(--mut)}
+select,input[type=number],input[type=text]{font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--fg);min-height:46px;transition:border-color .15s,box-shadow .15s}
+select:focus,input:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(15,76,92,.15)}
+input[type=number]{width:100px;font-variant-numeric:tabular-nums}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--pri);vertical-align:-4px}
+button{font-size:15.5px;font-weight:600;min-height:46px;padding:10px 18px;border-radius:12px;border:1px solid var(--pri);background:var(--pri);color:#fff;cursor:pointer;transition:transform .05s,opacity .15s}
+button:active{transform:scale(.98)}
+button.sec{background:transparent;color:var(--pri)}
+button.del{background:transparent;color:var(--bad);border-color:var(--line);padding:8px 12px;font-weight:500}
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{border:0;border-radius:9px;background:transparent;color:var(--mut);min-height:40px;padding:8px 16px}
+.seg button.on{background:var(--card);color:var(--pri);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.inj{display:grid;grid-template-columns:1.3fr 1.2fr 1.4fr auto;gap:8px;align-items:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}.inj>*{min-width:0;width:100%}.inj .del{width:auto}
+@media (max-width:600px){.inj{grid-template-columns:1fr 1fr}.inj .note{grid-column:1/2}.inj .del{grid-column:2/3;justify-self:end}}
+select,input{max-width:100%}
+.hint{font-size:12.5px;color:var(--mut)}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px}
+.big div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left}
+.big b{display:block;font-size:28px;line-height:1.15;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.big span{font-size:12.5px;color:var(--mut)}
+.steps{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;white-space:pre-wrap;word-break:break-word}
+.warn,.bad,.okb{border-radius:12px;padding:9px 12px;margin:6px 0;font-size:14px;border:1px solid transparent}
+.warn{background:var(--warnbg);color:var(--warn);border-color:rgba(154,91,0,.15)}
+.bad{background:var(--badbg);color:var(--bad);border-color:rgba(180,35,24,.15)}
+.okb{background:var(--okbg);color:var(--ok);border-color:rgba(22,121,74,.15)}
+.bars{display:flex;gap:8px;align-items:flex-end;height:140px;padding:6px 0;border-bottom:1px solid var(--line)}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.bar i{display:block;width:62%;background:var(--line);border-radius:8px 8px 2px 2px;min-height:3px}
+.bar i.top{background:linear-gradient(180deg,var(--pri),var(--pri-ink))}
+.bar em{font-style:normal;font-size:13px;font-weight:650}
+.barl{display:flex;gap:8px}.barl span{flex:1;text-align:center;font-size:12px;color:var(--mut)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:center}
+th{color:var(--mut);font-weight:600;font-size:13px}
+tr.diff td{background:var(--hl)}
+details summary{cursor:pointer;color:var(--pri);font-weight:600}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:700px){.cols{grid-template-columns:1fr}}
+.hidden{display:none!important}
+/* danger tier */
+.tier{border-radius:var(--r);padding:16px 18px;color:#fff;margin-bottom:12px;display:flex;gap:14px;align-items:center;box-shadow:var(--shadow)}
+.tier .lv{font-size:13px;opacity:.9;letter-spacing:1px}
+.tier .nm{font-size:24px;font-weight:750;line-height:1.2}
+.tier .why{background:rgba(255,255,255,.14);color:#fff;border-radius:10px;padding:6px 10px;margin:6px 0 0;font-size:13px}
+.tier .dot{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.t-red{background:linear-gradient(135deg,#c0262d,#8e1a20)}.t-orange{background:linear-gradient(135deg,#e07a2c,#b4521a)}
+.t-yellow{background:linear-gradient(135deg,#d6a613,#a57d06)}.t-green{background:linear-gradient(135deg,#2f8f5b,#1f6a42)}.t-grey{background:linear-gradient(135deg,#64748b,#475569)}
+.acts{display:grid;gap:8px;margin:10px 0}
+.act{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--pri);border-radius:12px;padding:10px 12px}
+.act.p1{border-left-color:var(--red)}.act.p2{border-left-color:var(--orange)}.act.p3{border-left-color:var(--yellow)}
+.act .n{width:26px;height:26px;border-radius:50%;background:var(--pri);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.act.p1 .n{background:var(--red)}.act.p2 .n{background:var(--orange)}.act.p3 .n{background:var(--yellow)}
+.act b{display:block;font-size:15px}.act span{font-size:13.5px;color:var(--mut)}
+.role{display:inline-block;font-size:11.5px;font-weight:650;padding:1px 8px;border-radius:999px;margin-right:6px;background:var(--pri2);color:var(--pri)}
+.role.nurse{background:#f3ecfb;color:#6b3fa0}.role.team{background:#fdf0e3;color:#a35112}
+.src{font-size:11.5px;color:var(--mut);margin-top:2px}
+.vbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.vbox div{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px}
+.vbox b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.lesson-hero{background:linear-gradient(135deg,var(--pri2),var(--card))}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips a{font-size:13.5px;padding:6px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--pri);text-decoration:none}
+.lesson p{margin:6px 0}.analogy{border-left:4px solid var(--pri);padding:6px 10px;background:var(--pri2);border-radius:0 10px 10px 0}
+.formula{font-family:ui-monospace,Menlo,monospace;font-size:14px;background:var(--bg);border:1px dashed var(--pri);border-radius:10px;padding:8px 10px;margin:8px 0;word-break:break-word}
+.why{background:var(--okbg);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:14.5px}
+.example{background:var(--warnbg);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:14.5px}
+.pit{padding-left:18px;margin:8px 0;font-size:14.5px}.pit li{margin:3px 0;list-style:none;margin-left:-18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:600px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}}
+.tile{background:var(--bg);border-radius:12px;padding:10px}.tile b{display:block;color:var(--pri)}.tile span{font-size:14px}.tile i{display:block;font-size:13px;color:var(--mut);margin-top:4px}
+.scale{display:flex;border-radius:10px;overflow:hidden;margin:8px 0;font-size:13px;text-align:center}.scale span{flex:1;padding:6px 4px;color:#fff}
+.s1{background:var(--green)}.s2{background:var(--yellow)}.s3{background:var(--red)}
+table.mini{margin:8px 0}table.mini th{background:var(--pri2)}
+.lesson details{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0}.lesson details p{margin:6px 0 0}
+.case{border:1px solid var(--line);border-radius:12px;padding:10px;margin:10px 0}.case p{font-size:14.5px}
+html{scroll-behavior:smooth}
+footer{font-size:12px;color:var(--mut);text-align:center;padding:18px}
+@media print{header{position:static}button,.seg,.noprint{display:none!important}.card{break-inside:avoid;box-shadow:none}.tier{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header>
+  <h1>创伤评分计算器<small>v3.1</small></h1>
+  <div class="disc">结果仅供临床参考与教学，AIS 以官方手册为准；TRISS 系数来自美国 MTOS 数据，未在中国人群校准。</div>
+</header>
+<main>
+  <div id="selftest"></div>
+
+  <div class="card noprint">
+    <div class="row" style="justify-content:space-between">
+      <div class="seg" id="modeSeg"><button data-m="clin" class="on">临床模式</button><button data-m="teach">教学模式</button></div>
+      <div class="row"><button class="sec" id="btnExample">载入示例</button><button class="sec" id="btnClear">清空</button></div>
+    </div>
+  </div>
+
+  <div class="card noprint" id="lessonTip"><span class="hint">📘 想看评分说明和病例练习？切换到“教学模式”。</span></div>
+/*__LESSON__*/
+  <div class="card">
+    <h2>1. AIS 版本与损伤录入</h2>
+    <div class="row"><label for="aisVer">AIS 版本（必选）</label>
+      <select id="aisVer"><option value="">请选择</option><option>AIS 98</option><option>AIS 2005-Update 2008</option><option>AIS 2015</option><option>未知</option></select></div>
+    <p class="hint">区域归属提示：颈椎→头颈部；胸椎→胸部；腰椎→腹部；骨盆→四肢及骨盆带。AIS 严重度由医生按 AAAM 手册判定，本工具不含 AIS 词典。备注请勿填写可识别患者身份的信息。</p>
+    <div id="clinInj"></div>
+    <div id="teachInj" class="cols hidden">
+      <div><h3 style="margin:4px 0">评分者 A / 学员</h3><div id="injA"></div></div>
+      <div><h3 style="margin:4px 0">评分者 B / 标准答案</h3><div id="injB"></div></div>
+    </div>
+  </div>
+
+  <div class="card" id="physCard">
+    <h2>2. 生理参数（RTS）与休克指数</h2>
+    <div class="row">
+      <label>GCS E<select id="gE"><option value="">-</option><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+      <label>V<select id="gV"><option value="">-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+      <label>M<select id="gM"><option value="">-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+      <span id="gcsSum" class="hint"></span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label><input type="checkbox" id="intub"> 已插管/镇静，V 无法评估</label>
+      <select id="intubWay" class="hidden"><option value="">请选择处理方式</option><option value="meredith">Meredith 推算 V</option><option value="v1">V 记 1</option><option value="none">不计算 RTS/TRISS</option></select>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label>SBP <input type="number" id="sbp" min="0" max="300" inputmode="numeric"> mmHg</label>
+      <label>RR <input type="number" id="rr" min="0" max="80" inputmode="numeric"> 次/分</label>
+      <label>HR <input type="number" id="hr" min="0" max="300" inputmode="numeric"> 次/分</label>
+    </div>
+  </div>
+
+  <div class="card" id="trissCard">
+    <h2>3. TRISS 参数</h2>
+    <div class="row">
+      <label>年龄 <input type="number" id="age" min="0" max="120" inputmode="numeric"> 岁</label>
+      <div class="seg" id="mechSeg"><button data-v="blunt" class="on">钝性</button><button data-v="penetrating">穿透</button></div>
+      <span class="hint">混合伤请选主要机制</span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label>系数版本 <select id="coefVer"><option value="mtos1995">MTOS 1995（默认）</option><option value="boyd1987">Boyd 1987（原始版）</option></select></label>
+      <label><input type="checkbox" id="peds" checked> 儿童规则：&lt;15 岁穿透伤按钝性系数</label>
+    </div>
+  </div>
+
+  <div class="card" id="extraCard">
+    <h2>4. 临床补充（可选，用于分级与操作提示）</h2>
+    <div class="row">
+      <label>伤后时间 <input type="number" id="hours" min="0" max="240" step="0.5" inputmode="decimal"> 小时</label>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label><input type="checkbox" id="fast"> FAST 阳性</label>
+      <label><input type="checkbox" id="torsoPen"> 躯干穿透伤</label>
+      <label><input type="checkbox" id="anticoag"> 服用抗凝/抗血小板药</label>
+    </div>
+    <p class="hint">伤后时间用于判断氨甲环酸窗口（3 小时）；FAST、躯干穿透伤参与 ABC 评分。</p>
+  </div>
+
+  <div class="card" id="resCard">
+    <h2>结果</h2>
+    <div id="resBody"></div>
+    <div class="row noprint" style="margin-top:10px"><button id="btnCopy">复制结果</button><button class="sec" id="btnPrint">打印 / 存为 PDF</button><span id="copyMsg" class="hint"></span></div>
+  </div>
+
+  <div class="card">
+    <details><summary>外部数据验证（公开国际数据）</summary>
+      <p class="hint" style="font-size:13.5px">以下数值均由本工具内置计算核心直接计算，指标为对院内死亡的 AUC（DeLong 95% CI）。</p>
+      <table><tr><th>数据集</th><th>n</th><th>评分</th><th>AUC</th><th>文献值</th></tr>
+      <tr><td rowspan="4">TITCO-I（印度 4 中心）</td><td>13,602</td><td>ISS</td><td>0.609</td><td>0.62</td></tr>
+      <tr><td>13,602</td><td>NISS</td><td>0.638</td><td>0.65</td></tr>
+      <tr><td>8,267</td><td>RTS</td><td>0.832</td><td>0.81</td></tr>
+      <tr><td>7,777</td><td>TRISS</td><td>0.830</td><td>0.82</td></tr>
+      <tr><td rowspan="2">CRASH-2（40 国出血创伤）</td><td>20,207</td><td>RTS</td><td>0.808</td><td>—</td></tr>
+      <tr><td>20,207</td><td>SI</td><td>0.627</td><td>—</td></tr>
+      <tr><td rowspan="2">UVA（美国一级创伤中心）</td><td>18,680</td><td>ISS</td><td>0.821</td><td>0.830</td></tr>
+      <tr><td>18,680</td><td>NISS</td><td>0.817</td><td>0.827</td></tr></table>
+      <p class="hint" style="font-size:13.5px">
+      · 实现一致性：TRISS 与 CRAN traumar 1.2.7 比对 1000 组随机输入，最大差 2.2×10⁻¹⁶；ISS 重算与 TITCO 登记值一致 99.99%。<br>
+      · 校准警示：MTOS 系数在 TITCO 中预期死亡 383 例、实际 1479 例（Z=−67），显著低估死亡；在中国人群使用 Ps 须谨慎。<br>
+      · 危险分级死亡率（红/橙/黄/绿）：TITCO 46.2/10.4/4.7/5.0%；CRASH-2 25.8/5.8/3.3/2.1%；UVA（仅 ISS）33.5/4.3/2.2/0.9%。红色对死亡的敏感度/特异度：TITCO 0.76/0.77。<br>
+      · 数据来源：TITCO-I（CC BY 4.0，doi:10.5281/zenodo.7832819）；CRASH-2（Lancet 2010/2011，hbiostat.org 公开镜像）；UVA（Larkin 2022，CC BY 4.0，doi:10.6084/m9.figshare.19606138）；文献值：Roy N, Injury 2016;47:2459；Larkin, Injury 2022。<br>
+      · 局限：TITCO 为中低收入国家人群且 RR 缺失约 41%；CRASH-2 为出血试验人群、无 ISS；UVA 仅有 ISS/NISS。均非中国数据。</p>
+    </details>
+  </div>
+  <div class="card">
+    <details><summary>方法与参考文献</summary>
+      <ul class="hint" style="font-size:13.5px">
+        <li>ISS：Baker SP, et al. J Trauma 1974. 每区取最高 AIS，取最高 3 区平方和；任一 AIS 6 记 75。AIS 9（不详）不参与计算。</li>
+        <li>NISS：Osler T, et al. J Trauma 1997. 不分区域取最高 3 处 AIS 平方和（AIS 6 记 75 为常用约定）。</li>
+        <li>RTS：Champion HR, et al. J Trauma 1989. 加权 RTS = 0.9368×GCSc + 0.7326×SBPc + 0.2908×RRc（0–7.8408）；T-RTS 为编码值之和（0–12，用于分诊）。</li>
+        <li>TRISS：Boyd CR, et al. J Trauma 1987；Champion HR, et al. 1995 修订系数。Ps = 1/(1+e<sup>−b</sup>)，b = b0 + b1·RTS + b2·ISS + b3·年龄指数（≥55 岁为 1）。</li>
+        <li>插管患者 GCS-V 推算：Meredith W, et al. J Trauma 1998：V = −0.3756 + 0.5713·M + 0.4233·E。</li>
+        <li>AIS 版本等效界值：AIS 2005/2008 与 AIS 98 相比 ISS≥16 人数减少约 20–28%（Salottolo 2009；Palmer 2011）。</li>
+        <li>休克指数 SI = HR/SBP；年龄休克指数 = 年龄×SI（Kim 2016 指出阈值 50 在老年人中可能过度分类）。</li>
+        <li>TRISS 系数实现参考 bemts-hhs/traumar（MIT License, Copyright (c) bemts-hhs）。</li>
+        <li>危险分级与操作提示依据：ATLS 11 版（xABCDE）；欧洲创伤大出血与凝血病指南第 6 版（Rossaint, Crit Care 2023）；创伤失血性休克中国急诊专家共识（2023）；ACS 现场分诊指南（2021）；ACS TQIP 大量输血指南（ABC 评分）；CRASH-2（氨甲环酸 3 小时窗口）；BTF 重型颅脑损伤指南第 4 版；Mutschler 2013（SI 分级）；Kim 2016（年龄休克指数）；T/CADERM 3036-2020（严重创伤定义）。复评间隔为本工具设定。</li>
+        <li>本工具不内置任何 AIS 词典条目或代码（AIS © AAAM）；不联网、不保存任何数据。</li>
+      </ul>
+    </details>
+  </div>
+</main>
+<footer id="foot">创伤评分计算器 v3 · 离线单文件 · 仅供参考与教学</footer>
+
+<script>
+/*__CORE__*/
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+var TESTS = runSelfTests();
+var nPass = TESTS.filter(function(x){return x.pass;}).length;
+var TEST_OK = nPass === TESTS.length;
+$("foot").textContent = "创伤评分计算器 v3 · 离线单文件 · 自检通过 " + nPass + "/" + TESTS.length + " · 仅供参考与教学";
+if (!TEST_OK) {
+  $("selftest").innerHTML = '<div class="bad">自检未通过（' + nPass + '/' + TESTS.length + '），结果已停用：<br>' +
+    TESTS.filter(function(x){return !x.pass;}).map(function(x){return x.name + "：得 " + x.got + "，应为 " + x.exp;}).join("<br>") + '</div>';
+}
+
+var state = { mode: "clin", mech: "blunt", role: "all", lists: { clin: [], A: [], B: [] } };
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+function renderList(key, el){
+  var list = state.lists[key];
+  var h = "";
+  list.forEach(function(it, i){
+    h += '<div class="inj">' +
+      '<select data-k="'+key+'" data-i="'+i+'" data-f="region">' + REGIONS.map(function(r,ri){ return '<option value="'+ri+'"'+(it.region===ri?" selected":"")+'>'+r+'</option>'; }).join("") + '</select>' +
+      '<select data-k="'+key+'" data-i="'+i+'" data-f="ais"><option value="">AIS</option>' + [1,2,3,4,5,6,9].map(function(a){ return '<option value="'+a+'"'+(it.ais===a?" selected":"")+'>'+a+' '+AIS_LABEL[a]+'</option>'; }).join("") + '</select>' +
+      '<input class="note" type="text" placeholder="备注（可选）" data-k="'+key+'" data-i="'+i+'" data-f="note" value="'+esc(it.note||"")+'">' +
+      '<button class="del" data-k="'+key+'" data-del="'+i+'">删除</button></div>';
+  });
+  h += '<button class="sec" data-add="'+key+'">＋ 添加损伤</button>';
+  el.innerHTML = h;
+}
+function renderLists(){
+  renderList("clin", $("clinInj")); renderList("A", $("injA")); renderList("B", $("injB"));
+}
+document.addEventListener("change", function(e){
+  var t = e.target; if (!t.dataset || !t.dataset.k) return;
+  var it = state.lists[t.dataset.k][+t.dataset.i];
+  if (t.dataset.f === "region") it.region = +t.value;
+  else if (t.dataset.f === "ais") it.ais = t.value === "" ? null : +t.value;
+  update();
+});
+document.addEventListener("input", function(e){
+  var t = e.target; if (t.dataset && t.dataset.f === "note") { state.lists[t.dataset.k][+t.dataset.i].note = t.value; }
+});
+document.addEventListener("click", function(e){
+  var t = e.target;
+  if (t.dataset && t.dataset.add) { state.lists[t.dataset.add].push({region:0, ais:null, note:""}); renderLists(); update(); }
+  if (t.dataset && t.dataset.del !== undefined && t.dataset.k) { state.lists[t.dataset.k].splice(+t.dataset.del,1); renderLists(); update(); }
+});
+
+$("modeSeg").addEventListener("click", function(e){
+  var m = e.target.dataset.m; if (!m) return; state.mode = m;
+  [].forEach.call($("modeSeg").children, function(b){ b.classList.toggle("on", b.dataset.m===m); });
+  $("clinInj").classList.toggle("hidden", m!=="clin");
+  $("teachInj").classList.toggle("hidden", m!=="teach");
+  $("physCard").classList.toggle("hidden", m!=="clin");
+  $("trissCard").classList.toggle("hidden", m!=="clin");
+  $("extraCard").classList.toggle("hidden", m!=="clin");
+  $("lesson").classList.toggle("hidden", m!=="teach");
+  $("lessonTip").classList.toggle("hidden", m==="teach");
+  update();
+});
+$("mechSeg").addEventListener("click", function(e){
+  var v = e.target.dataset.v; if (!v) return; state.mech = v;
+  [].forEach.call($("mechSeg").children, function(b){ b.classList.toggle("on", b.dataset.v===v); });
+  update();
+});
+$("intub").addEventListener("change", function(){ $("intubWay").classList.toggle("hidden", !this.checked); $("gV").disabled = this.checked; update(); });
+["aisVer","gE","gV","gM","intubWay","sbp","rr","hr","age","coefVer","peds","hours","fast","torsoPen","anticoag"].forEach(function(id){
+  $(id).addEventListener("input", update); $(id).addEventListener("change", update);
+});
+
+function num(id, lo, hi){ var v = $(id).value; if (v === "") return null; v = Number(v); if (!isFinite(v) || Math.floor(v)!==v) return NaN; return v; }
+function validInj(list){ return list.filter(function(x){ return x.ais !== null && x.ais !== undefined; }); }
+
+function bars(res){
+  var h = '<div class="bars">';
+  res.regionMax.forEach(function(v, r){
+    var top = res.topRegions.indexOf(r) >= 0;
+    h += '<div class="bar"><em>'+v+'</em><i class="'+(top?"top":"")+'" style="height:'+(v/6*100)+'%"></i></div>';
+  });
+  h += '</div><div class="barl">' + REGION_SHORT.map(function(s){ return '<span>'+s+'</span>'; }).join("") + '</div>';
+  return h + '<div class="hint">深色柱为计入 ISS 的区域</div>';
+}
+function issSteps(res){
+  if (res.has6) return "存在 AIS 6 → ISS = 75，NISS = 75（AIS 6 规则）";
+  if (res.nValid === 0) return "无有效损伤 → ISS = 0，NISS = 0";
+  var a = res.topRegions.map(function(r){ return REGIONS[r] + " " + res.regionMax[r] + "²"; }).join(" + ");
+  var b = res.topRegions.map(function(r){ return res.regionMax[r]*res.regionMax[r]; }).join(" + ");
+  var n1 = res.nissTop.map(function(x){ return x+"²"; }).join(" + ");
+  var n2 = res.nissTop.map(function(x){ return x*x; }).join(" + ");
+  return "ISS = " + a + " = " + b + " = " + res.iss + "\nNISS = " + n1 + " = " + n2 + " = " + res.niss;
+}
+
+var lastCopy = "";
+document.addEventListener("click", function(e){ var r = e.target.dataset && e.target.dataset.r; if (!r) return; state.role = r; update(); });
+function update(){
+  var gE = $("gE").value, gV = $("gV").value, gM = $("gM").value;
+  var intub = $("intub").checked, way = $("intubWay").value;
+  var vUsed = null, gcsNote = "";
+  if (intub) {
+    if (way === "meredith" && gE && gM) { vUsed = meredithV(+gE, +gM); gcsNote = "V 由 Meredith 公式推算为 " + vUsed; }
+    else if (way === "v1") { vUsed = 1; gcsNote = "V 记 1"; }
+  } else if (gV) vUsed = +gV;
+  var gcs = (gE && gM && vUsed !== null) ? (+gE + vUsed + +gM) : null;
+  $("gcsSum").textContent = gcs !== null ? ("GCS = " + gcs + (intub ? "（非标准 GCS：" + gcsNote + "）" : "")) : "";
+
+  var out = "", warns = [], errs = [];
+  if (!TEST_OK) { $("resBody").innerHTML = '<div class="bad">自检未通过，结果已停用。</div>'; return; }
+  var aisVer = $("aisVer").value;
+  if (!aisVer) warns.push("请先选择 AIS 版本（写入结果与导出）。");
+
+  if (state.mode === "teach") {
+    var A = calcISS(validInj(state.lists.A)), B = calcISS(validInj(state.lists.B));
+    var d = A.iss - B.iss;
+    out += '<table><tr><th>项目</th><th>评分者 A</th><th>评分者 B</th></tr>';
+    REGIONS.forEach(function(r, i){ out += '<tr class="'+(A.regionMax[i]!==B.regionMax[i]?"diff":"")+'"><td>'+r+' 最高 AIS</td><td>'+A.regionMax[i]+'</td><td>'+B.regionMax[i]+'</td></tr>'; });
+    out += '<tr class="'+(A.iss!==B.iss?"diff":"")+'"><td><b>ISS</b></td><td><b>'+A.iss+'</b></td><td><b>'+B.iss+'</b></td></tr>';
+    out += '<tr class="'+(A.niss!==B.niss?"diff":"")+'"><td><b>NISS</b></td><td><b>'+A.niss+'</b></td><td><b>'+B.niss+'</b></td></tr></table>';
+    out += (Math.abs(d) <= 3 ? '<div class="okb">ISS 差值 '+d+'：合格（±3 分）</div>' : '<div class="bad">ISS 差值 '+d+'：需复核</div>');
+    out += '<div class="steps">A：' + issSteps(A) + '\n\nB：' + issSteps(B) + '</div>';
+    if (A.hasAIS9 || B.hasAIS9) warns.push("存在 AIS 9（不详），ISS 可能低估。");
+    lastCopy = "教学对比：A ISS="+A.iss+"/NISS="+A.niss+"；B ISS="+B.iss+"/NISS="+B.niss+"；ISS 差值="+d+"（"+(Math.abs(d)<=3?"合格":"需复核")+"）；AIS 版本："+(aisVer||"未选")+"；工具版本 v3；计算时间："+new Date().toLocaleString("zh-CN");
+    $("resBody").innerHTML = warns.map(function(w){return '<div class="warn">'+w+'</div>';}).join("") + out;
+    return;
+  }
+
+  var res = calcISS(validInj(state.lists.clin));
+  if (!issPossible(res.iss)) errs.push("内部错误：ISS=" + res.iss + " 不是可能值，请报告。");
+  if (res.hasAIS9) warns.push("存在 AIS 9（不详），ISS 可能低估。");
+
+  var sbp = num("sbp"), rr = num("rr"), hr = num("hr"), age = num("age");
+  [["SBP",sbp,0,300],["RR",rr,0,80],["HR",hr,0,300],["年龄",age,0,120]].forEach(function(x){
+    if (x[1] !== null && (isNaN(x[1]) || x[1] < x[2] || x[1] > x[3])) errs.push(x[0] + " 须为 " + x[2] + "–" + x[3] + " 的整数。");
+  });
+  var physOK = gcs !== null && sbp !== null && rr !== null && !errs.length;
+  var rtsRes = null, tr = null, si = null;
+  if (intub && !way) warns.push("已勾选插管/镇静：请选择 GCS-V 处理方式。");
+  if (intub && way === "none") warns.push("已选择插管患者不计算 RTS/TRISS。");
+  else if (physOK) rtsRes = calcRTS(gcs, sbp, rr);
+  if (intub && rtsRes) warns.push("非标准 GCS（" + gcsNote + "）；呼吸机控制下 RR 也可能使 RTS 不可靠。");
+
+  var ageOK = age !== null && !isNaN(age) && age >= 0 && age <= 120;
+  if (rtsRes && ageOK && res.nValid > 0 && res.iss > 0) tr = calcTRISS(rtsRes.rts, res.iss, age, state.mech, $("coefVer").value, $("peds").checked);
+  if (hr !== null && sbp !== null && !errs.length) si = calcSI(hr, sbp, ageOK ? age : -1);
+
+  if (ageOK && age < 15) warns.push("年龄 <15 岁：RTS 的 RR 区间不适用于幼儿，结果需谨慎解读。");
+  if (ageOK && age >= 55) warns.push("年龄 ≥55 岁：TRISS 在老年人中常高估生存概率。");
+  if (tr && tr.pedsApplied) warns.push("儿童规则已应用：<15 岁穿透伤按钝性系数计算（经典 TRISS 约定；traumar 不做此处理）。");
+  if ((sbp !== null && sbp > 250) || (rr !== null && rr > 60)) warns.push("SBP 或 RR 超出常见范围，请核对。");
+  if (res.nValid > 0 && res.iss === 0) {}
+  var grade = issGrade(res.iss);
+  var hrs = $("hours").value === "" ? null : Number($("hours").value);
+  var P = {gcs:gcs, sbp:(sbp!==null&&!isNaN(sbp))?sbp:null, rr:(rr!==null&&!isNaN(rr))?rr:null, hr:(hr!==null&&!isNaN(hr))?hr:null,
+    si:si?si.si:null, ageSI:si?si.ageSI:null, age:ageOK?age:null, iss:res.nValid>0?res.iss:null, niss:res.nValid>0?res.niss:null,
+    ps:tr?tr.ps:null, mech:state.mech, intub:intub, headAIS:res.regionMax[0]||null, hours:(hrs!==null&&isFinite(hrs))?hrs:null,
+    fast:$("fast").checked, torsoPen:$("torsoPen").checked, anticoag:$("anticoag").checked};
+  var tier = calcTier(P), acts = tier.level === "grey" ? [] : getActions(P, tier);
+  var ICON = {red:"!", orange:"▲", yellow:"●", green:"✓", grey:"…"};
+  var ROLE = {doc:["医生",""], nurse:["护士","nurse"], team:["团队","team"]};
+  var PRI = {1:"立即", 2:"尽快", 3:"后续"};
+  var th = '<div class="tier t-'+tier.level+'"><div class="dot">'+ICON[tier.level]+'</div><div style="flex:1;min-width:0"><div class="lv">危险分级</div><div class="nm">'+tier.name+'</div><div style="font-size:14px;opacity:.95">'+tier.sub+(tier.recheck?' · '+tier.recheck:'')+'</div>' +
+    (tier.reasons.length && tier.level!=="green" ? '<div class="why">触发：'+tier.reasons.join("；")+'</div>' : '') + '</div></div>';
+  if (acts.length) {
+    var first = acts[0];
+    th += '<h3 style="font-size:15px;margin:14px 0 6px">首要操作</h3><div class="act p1" style="border-left-width:6px"><div class="n">1</div><div><span class="role '+ROLE[first.role][1]+'">'+ROLE[first.role][0]+'</span><b style="display:inline">'+first.title+'</b><span style="display:block">'+first.text+'</span><div class="src">依据：'+first.src.join("；")+'</div></div></div>';
+    if (acts.length > 1) {
+      th += '<h3 style="font-size:15px;margin:14px 0 6px">推荐操作清单 <span class="hint">（按优先级）</span></h3><div class="seg noprint" id="roleSeg" style="margin-bottom:8px"><button data-r="all" class="'+(state.role==="all"?"on":"")+'">全部</button><button data-r="doc" class="'+(state.role==="doc"?"on":"")+'">医生</button><button data-r="nurse" class="'+(state.role==="nurse"?"on":"")+'">护士</button><button data-r="team" class="'+(state.role==="team"?"on":"")+'">团队</button></div><div class="acts">';
+      acts.slice(1).forEach(function(a, i){
+        if (state.role !== "all" && a.role !== state.role) return;
+        th += '<div class="act p'+a.pri+'"><div class="n">'+(i+2)+'</div><div><span class="role '+ROLE[a.role][1]+'">'+ROLE[a.role][0]+'</span><span class="role" style="background:transparent;padding:0;color:var(--mut)">'+PRI[a.pri]+'</span><b>'+a.title+'</b><span>'+a.text+'</span><div class="src">依据：'+a.src.join("；")+'</div></div></div>';
+      });
+      th += '</div>';
+    }
+    th += '<p class="hint">以上为指南要点提醒，供医护团队核对，不构成医嘱；具体处置由主诊医师结合床旁情况决定。分级阈值已用 TITCO-I、CRASH-2、UVA 公开数据检验（见“方法与验证”）。</p>';
+  }
+
+  out += th + '<h3 style="font-size:15px;margin:16px 0 8px">评分结果</h3>';
+  out += '<div class="big">' +
+    '<div><b>'+res.iss+'</b><span>ISS · '+grade+(res.iss>=16?" · 严重创伤":"")+'</span></div>' +
+    '<div><b>'+res.niss+'</b><span>NISS</span></div>' +
+    '<div><b>'+(rtsRes?rtsRes.rts.toFixed(4):"—")+'</b><span>加权 RTS（0–7.8408）</span></div>' +
+    '<div><b>'+(rtsRes?rtsRes.trts:"—")+'</b><span>T-RTS（分诊，0–12）</span></div>' +
+    '<div><b>'+(tr?(tr.ps*100).toFixed(1)+"%":"—")+'</b><span>TRISS 预测生存概率</span></div>' +
+    '<div><b>'+(si?si.si.toFixed(2):"—")+'</b><span>休克指数 SI'+(si&&si.si>=1?" ≥1.0":"")+'</span></div>' +
+    '</div>';
+  out += '<p class="hint">ISS 分层：1–8 轻度，9–15 中度，16–24 重度，≥25 极重度；ISS ≥16 为 AIS 98 时代常用“严重创伤”界值。不同 AIS 版本等效界值不同（文献报道 AIS 2008 约 ISS &gt;12、AIS 2015 约 ISS ≥12 与之相当），不同版本 ISS 不可直接比较；不同文献界值略有差异。</p>';
+  out += bars(res);
+
+  var st = issSteps(res);
+  if (rtsRes) st += "\n\nRTS 编码：GCS " + gcs + "→" + rtsRes.gc + "，SBP " + sbp + "→" + rtsRes.sc + "，RR " + rr + "→" + rtsRes.rc +
+    "\n加权 RTS = 0.9368×" + rtsRes.gc + " + 0.7326×" + rtsRes.sc + " + 0.2908×" + rtsRes.rc + " = " + rtsRes.rts.toFixed(4) +
+    "\nT-RTS = " + rtsRes.gc + " + " + rtsRes.sc + " + " + rtsRes.rc + " = " + rtsRes.trts;
+  if (tr) { var c = tr.coef; st += "\n\nTRISS（" + tr.versionName + "，" + (tr.usedMech==="blunt"?"钝性":"穿透") + "系数，年龄指数 " + tr.ageIndex + "）" +
+    "\nb = " + c[0] + " + " + c[1] + "×" + rtsRes.rts.toFixed(4) + " + (" + c[2] + ")×" + res.iss + " + (" + c[3] + ")×" + tr.ageIndex + " = " + tr.b.toFixed(4) +
+    "\nPs = 1/(1+e^(−b)) = " + tr.ps.toFixed(4); }
+  else if (rtsRes && res.iss === 0) st += "\n\nISS=0，不计算 Ps。";
+  else if (!tr) st += "\n\nTRISS 需要：完整 GCS、SBP、RR、年龄和至少一处损伤。";
+  if (si) st += "\n\nSI = " + hr + "/" + sbp + " = " + si.si.toFixed(2) + (si.ageSI!==null ? "；年龄休克指数 = " + age + "×" + si.si.toFixed(2) + " = " + si.ageSI.toFixed(1) + (si.ageSI>=50?"（≥50；老年人中可能过度分类）":"") : "");
+  out += '<h3 style="font-size:15px;margin:12px 0 6px">计算过程</h3><div class="steps">' + esc(st) + '</div>';
+  out += '<p class="hint">TRISS 不适用于烧伤、窒息、溺水；Ps 为预测生存概率，不代表个体“应存活/应死亡”。</p>';
+
+  $("resBody").innerHTML = errs.map(function(w){return '<div class="bad">'+w+'</div>';}).join("") + warns.map(function(w){return '<div class="warn">'+w+'</div>';}).join("") + out;
+
+  var flags = warns.length ? warns.map(function(w){ return w.replace(/[。]$/,""); }).join("；") : "无";
+  lastCopy = "ISS=" + res.iss + "（" + REGION_SHORT.map(function(s,i){ return s + res.regionMax[i]; }).join("/") + "；AIS 版本：" + (aisVer||"未选") + "）；NISS=" + res.niss +
+    "；RTS=" + (rtsRes ? rtsRes.rts.toFixed(4) + "（GCS E" + gE + "V" + (vUsed!==null?vUsed+(intub?"*":""):"?") + "M" + gM + "=" + gcs + ", SBP " + sbp + ", RR " + rr + "）" : "未计算") +
+    "；T-RTS=" + (rtsRes ? rtsRes.trts : "—") +
+    "；TRISS Ps=" + (tr ? (tr.ps*100).toFixed(1) + "%（" + ($("coefVer").value==="mtos1995"?"MTOS 1995":"Boyd 1987") + "，" + (tr.usedMech==="blunt"?"钝性":"穿透") + "，年龄指数 " + tr.ageIndex + "）" : "未计算") +
+    "；SI=" + (si ? si.si.toFixed(2) : "—") + "；危险分级：" + tier.name + "（" + tier.reasons.join("、") + "）" + "；首要操作：" + (acts[0] ? acts[0].title : "—") + "；标记：" + flags + "；工具版本 v3；计算时间：" + new Date().toLocaleString("zh-CN");
+}
+
+$("btnCopy").addEventListener("click", function(){
+  var done = function(){ $("copyMsg").textContent = "已复制"; setTimeout(function(){ $("copyMsg").textContent = ""; }, 2000); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(lastCopy).then(done, fallback); else fallback();
+  function fallback(){ var ta = document.createElement("textarea"); ta.value = lastCopy; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch(e){ prompt("请手动复制：", lastCopy); } document.body.removeChild(ta); }
+});
+var CASES = {
+  1: { inj: [[0,4],[0,3],[2,3],[3,2],[4,3]], v: {gE:"3",gV:"4",gM:"6",sbp:"100",rr:"22",hr:"96",age:"72"}, mech:"blunt" },
+  2: { inj: [[0,4],[0,4],[2,2]], v: {gE:"2",gV:"1",gM:"4",sbp:"110",rr:"12",hr:"88",age:"35"}, mech:"blunt" },
+  3: { inj: [[3,4],[2,3],[5,1]], v: {gE:"4",gV:"5",gM:"6",sbp:"70",rr:"30",hr:"118",age:"28"}, mech:"penetrating" }
+};
+document.addEventListener("click", function(e){
+  var k = e.target.dataset && e.target.dataset.case; if (!k) return;
+  var c = CASES[k];
+  state.lists.B = c.inj.map(function(p){ return {region:p[0], ais:p[1], note:"病例"+k}; });
+  state.lists.A = [{region:0, ais:null, note:""}];
+  Object.keys(c.v).forEach(function(id){ $(id).value = c.v[id]; });
+  state.mech = c.mech; [].forEach.call($("mechSeg").children, function(b){ b.classList.toggle("on", b.dataset.v===c.mech); });
+  $("aisVer").value = "AIS 2005-Update 2008";
+  renderLists(); update();
+  $("teachInj").scrollIntoView({behavior:"smooth"});
+});
+$("btnPrint").addEventListener("click", function(){ window.print(); });
+$("btnClear").addEventListener("click", function(){
+  state.lists = { clin: [], A: [], B: [] };
+  ["gE","gV","gM","intubWay","sbp","rr","hr","age","aisVer","hours"].forEach(function(id){ $(id).value = ""; });
+  ["fast","torsoPen","anticoag"].forEach(function(id){ $(id).checked = false; });
+  $("intub").checked = false; $("intubWay").classList.add("hidden"); $("gV").disabled = false;
+  renderLists(); update();
+});
+$("btnExample").addEventListener("click", function(){
+  $("aisVer").value = "AIS 2005-Update 2008";
+  if (state.mode === "teach") {
+    state.lists.A = [{region:0,ais:4,note:"示例"},{region:2,ais:3},{region:4,ais:2}];
+    state.lists.B = [{region:0,ais:4,note:"示例"},{region:2,ais:4},{region:4,ais:3}];
+  } else {
+    state.lists.clin = [{region:0,ais:4,note:"示例：颅脑损伤"},{region:0,ais:3},{region:2,ais:3,note:"示例：多发肋骨骨折"},{region:4,ais:3,note:"示例：股骨干骨折"}];
+    $("gE").value = "2"; $("gV").value = "2"; $("gM").value = "4"; $("sbp").value = "80"; $("rr").value = "32"; $("hr").value = "120"; $("age").value = "60"; $("hours").value = "1";
+  }
+  renderLists(); update();
+});
+
+renderLists(); update();
+})();
+</script>
+</body>
+</html>
