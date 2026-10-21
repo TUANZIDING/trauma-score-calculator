@@ -69,6 +69,66 @@ function calcSI(hr, sbp, age){
   return { si: si, ageSI: (age>=0 ? age*si : null) };
 }
 
+
+/* ===== v3.2 床旁生理评分（无需 AIS）===== */
+/* GAP：Kondo 2011 Crit Care 15:R191。GCS(3–15) + 年龄<60 得3 + SBP>120 得6 / 60–120 得4 / <60 得0；3–24 分。 */
+function calcGAP(gcs, age, sbp){
+  if (!(gcs>=3 && gcs<=15) || !(age>=0) || !(sbp>=0)) return null;
+  var a = age < 60 ? 3 : 0, s = sbp > 120 ? 6 : (sbp >= 60 ? 4 : 0), v = gcs + a + s;
+  return { score:v, risk: v<=10 ? "high" : (v<=18 ? "mid" : "low"), riskName: v<=10 ? "高危(3–10)" : (v<=18 ? "中危(11–18)" : "低危(19–24)") };
+}
+/* MGAP：Sartorius 2010 Crit Care Med 38:831。GCS(3–15) + 钝性伤4 + 年龄<60 得5 + SBP>120 得5 / 60–120 得3；3–29 分。 */
+function calcMGAP(gcs, age, sbp, mech){
+  if (!(gcs>=3 && gcs<=15) || !(age>=0) || !(sbp>=0) || (mech!=="blunt" && mech!=="penetrating")) return null;
+  var v = gcs + (mech==="blunt" ? 4 : 0) + (age < 60 ? 5 : 0) + (sbp > 120 ? 5 : (sbp >= 60 ? 3 : 0));
+  return { score:v, risk: v<18 ? "high" : (v<=22 ? "mid" : "low"), riskName: v<18 ? "高危(<18)" : (v<=22 ? "中危(18–22)" : "低危(23–29)") };
+}
+/* rSIG：Kimura & Tanaka 2018 BMC Emerg Med（JTDB）。rSIG = SBP/HR × GCS；≤14.8 提示死亡风险升高（Lee 2024 韩国 31.8 万例建议 16.5）。 */
+function calcRSIG(gcs, sbp, hr){
+  if (!(gcs>=3 && gcs<=15) || !(sbp>=0) || !(hr>0)) return null;
+  var v = sbp/hr*gcs;
+  return { score:v, high: v <= 14.8 };
+}
+
+/* ===== v3.2 ICD-10 估算 ISS（交叉核对，不替代 AIS 手册评分）===== */
+/* 规则移植自 ICDPIC-R cat_trauma（MIT）：每码取映射 AIS 与区域；区域取最大值；ISS = 前三区域最大 AIS 平方和，任一 AIS 6 → 75；
+   NISS = 全部编码前三 AIS 平方和；死亡概率 Pmort = 1/(1+e^-(截距+Σ编码效应))。本工具对重复编码去重。 */
+function normICD(raw){
+  var s = String(raw||"").toUpperCase().replace(/[\s.．。]/g,"");
+  if (!/^[ST]\d\d/.test(s)) return null;
+  if (s.length >= 4 && typeof ICD_MAP !== "undefined" && ICD_MAP[s.slice(0,4)]) return s.slice(0,4);
+  if (typeof ICD_MAP !== "undefined" && ICD_MAP[s.slice(0,3)]) return s.slice(0,3);
+  return s.slice(0,4);
+}
+function calcICDISS(codes, ref){
+  ref = ref === "NIS" ? "NIS" : "TQIP";
+  var o = ref === "NIS" ? 2 : 0, seen = {}, items = [], bad = [], reg = [0,0,0,0,0,0], sevs = [], lp = ICD_INTERCEPT[ref], any6 = false;
+  (codes||[]).forEach(function(c){
+    var raw = String(c).trim(); if (!raw) return;
+    var k = normICD(raw);
+    if (!k || !ICD_MAP[k]) { bad.push(raw); return; }
+    if (seen[k]) return; seen[k] = 1;
+    var m = ICD_MAP[k], sev = m[o], r = m[o+1], eff = m[4 + (ref==="NIS"?1:0)];
+    if (eff === null) eff = m[4 + (ref==="NIS"?0:1)] || 0;   /* 缺失时用另一参考库（同 icdpicr 的 backup 逻辑） */
+    items.push({raw:raw, code:k, ais:sev, region:r}); sevs.push(sev);
+    if (sev > reg[r]) reg[r] = sev; if (sev === 6) any6 = true; lp += eff;
+  });
+  if (!items.length) return {n:0, bad:bad, items:[], iss:null, niss:null, pmort:null, regionMax:reg, ref:ref};
+  var top = reg.slice().sort(function(a,b){return b-a;}), iss = top[0]*top[0]+top[1]*top[1]+top[2]*top[2];
+  var ts = sevs.slice().sort(function(a,b){return b-a;}).slice(0,3), niss = ts.reduce(function(a,v){return a+v*v;},0);
+  if (any6) { iss = 75; niss = 75; }
+  return {n:items.length, bad:bad, items:items, iss:iss, niss:niss, pmort:1/(1+Math.exp(-lp)), regionMax:reg, ref:ref};
+}
+/* 与医生 AIS 评分比较：ISS 差 ≥9，或严重创伤(≥16)判定不一致，或某区域最大 AIS 相差 ≥2 → 建议复核 */
+function compareICD(icd, aisRes){
+  if (!icd || icd.iss === null || !aisRes || !(aisRes.nValid > 0)) return null;
+  var d = icd.iss - aisRes.iss, why = [];
+  if (Math.abs(d) >= 9) why.push("ISS 相差 " + (d>0?"+":"") + d);
+  if ((icd.iss >= 16) !== (aisRes.iss >= 16)) why.push("“严重创伤(ISS≥16)”判定不一致");
+  for (var r = 0; r < 6; r++) { var a = aisRes.regionMax[r]||0, b = icd.regionMax[r]||0; if (Math.abs(a-b) >= 2) why.push(REGIONS[r] + " AIS " + a + " vs ICD " + b); }
+  return {diff:d, review: why.length > 0, why: why};
+}
+
 function issGrade(iss){
   if (iss === 0) return "无";
   if (iss <= 8) return "轻度";
@@ -197,7 +257,17 @@ function runSelfTests(){
   // extra integrity checks
   var bad = [7,15,23,28,31,37,39,40,44,46,47,49,52,53,55,56,58,60,61,62,63,64,65,67,68,69,70,71,72,73,74];
   t("17 不可能 ISS 值集合", bad.every(function(v){ return !issPossible(v); }) && [0,1,9,16,25,34,50,66,75].every(issPossible), true);
+  t("18 GAP GCS15/30岁/SBP130", calcGAP(15,30,130).score+","+calcGAP(15,30,130).risk, "24,low");
+  t("19 GAP 边界 SBP120/60/59 年龄60", [120,60,59].map(function(x){return calcGAP(10,60,x).score;}).join("/"), "14/14/10");
+  t("20 MGAP 穿透 GCS8/40岁/SBP70", calcMGAP(8,40,70,"penetrating").score+","+calcMGAP(8,40,70,"penetrating").risk, "16,high");
+  t("21 MGAP 分组边界 17/18/22/23", [[13,70,50,"blunt"],[14,70,50,"blunt"],[10,40,100,"blunt"],[11,40,100,"blunt"]].map(function(a){return calcMGAP.apply(null,a).risk;}).join("/"), "high/mid/mid/low");
+  t("22 rSIG 120/80×10，≤14.8", calcRSIG(10,120,80).score.toFixed(1)+","+calcRSIG(10,120,80).high, "15.0,false");
+  t("23 无效输入返回 null", [calcGAP(2,30,100), calcMGAP(15,30,100,"x"), calcRSIG(15,100,0)].every(function(x){return x===null;}), true);
+  var ic = calcICDISS(["S06.5","S27.0","S72.0"]); t("24 ICD S06.5/S27.0/S72.0（TQIP）ISS,NISS,n", ic.iss+","+ic.niss+","+ic.n, "21,21,3");
+  ic = calcICDISS(["s06.501","S06.5","x99","S0650"]); t("25 ICD 国家临床版扩展码截断/去重/非伤编码", ic.n+","+ic.bad.join("|"), "1,x99");
+  t("26 ICD 无有效编码", calcICDISS([]).iss, null);
   return R;
 }
 
-if (typeof module !== "undefined") module.exports = { calcISS:calcISS, calcRTS:calcRTS, calcTRISS:calcTRISS, calcSI:calcSI, meredithV:meredithV, runSelfTests:runSelfTests, issPossible:issPossible, calcTier:calcTier, getActions:getActions };
+if (typeof module !== "undefined" && typeof ICD_MAP === "undefined") { var _m = require("./icdmap.js"); ICD_MAP = _m.ICD_MAP; ICD_INTERCEPT = _m.ICD_INTERCEPT; }
+if (typeof module !== "undefined") module.exports = { calcISS:calcISS, calcRTS:calcRTS, calcTRISS:calcTRISS, calcSI:calcSI, meredithV:meredithV, runSelfTests:runSelfTests, issPossible:issPossible, calcTier:calcTier, getActions:getActions, calcGAP:calcGAP, calcMGAP:calcMGAP, calcRSIG:calcRSIG, calcICDISS:calcICDISS, compareICD:compareICD, normICD:normICD };

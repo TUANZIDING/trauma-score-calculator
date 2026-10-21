@@ -175,6 +175,15 @@ footer{font-size:12px;color:var(--mut);text-align:center;padding:18px}
     <p class="hint">伤后时间用于判断氨甲环酸窗口（3 小时）；FAST、躯干穿透伤参与 ABC 评分。</p>
   </div>
 
+  <div class="card" id="icdCard">
+    <h2>5. ICD-10 交叉核对（实验性，可选）</h2>
+    <textarea id="icdIn" rows="3" style="width:100%;box-sizing:border-box;font-size:15px;padding:8px;border-radius:10px;border:1px solid #cfdfe0" placeholder="粘贴出院/病案首页损伤诊断 ICD-10 编码，逗号、空格或换行分隔，如：S06.5, S27.0, S72.0"></textarea>
+    <div class="row" style="margin-top:8px">
+      <label>参考库 <select id="icdRef"><option value="TQIP">TQIP（创伤中心，默认）</option><option value="NIS">NIS（住院样本）</option></select></label>
+    </div>
+    <p class="hint">按 ICDPIC-R 映射表由编码粗估 ISS，用来发现手工 AIS 漏项或误判，<b>不是 AIS 手册评分</b>，不参与分级与 TRISS。国家临床版扩展码（如 S06.501）自动截取亚目；T00–T14 等“部位未特指/多处损伤”编码无法映射；映射表把 S32（腰椎与骨盆骨折）整体归入腹部区域。</p>
+  </div>
+
   <div class="card" id="resCard">
     <h2>结果</h2>
     <div id="resBody"></div>
@@ -189,12 +198,21 @@ footer{font-size:12px;color:var(--mut);text-align:center;padding:18px}
       <tr><td>13,602</td><td>NISS</td><td>0.638</td><td>0.65</td></tr>
       <tr><td>8,267</td><td>RTS</td><td>0.832</td><td>0.81</td></tr>
       <tr><td>7,777</td><td>TRISS</td><td>0.830</td><td>0.82</td></tr>
+      <tr><td rowspan="3">TITCO-I · v3.2 新增</td><td>11,560</td><td>GAP</td><td>0.837</td><td>—</td></tr>
+      <tr><td>11,560</td><td>MGAP</td><td>0.831</td><td>—</td></tr>
+      <tr><td>11,365</td><td>rSIG</td><td>0.815</td><td>—</td></tr>
+      <tr><td rowspan="3">CRASH-2 · v3.2 新增</td><td>19,880</td><td>GAP</td><td>0.793</td><td>—</td></tr>
+      <tr><td>17,466</td><td>MGAP</td><td>0.767</td><td>—</td></tr>
+      <tr><td>19,791</td><td>rSIG</td><td>0.789</td><td>—</td></tr>
+      <tr><td>TITCO-I · ICD 估算</td><td>13,292</td><td>ICD-ISS（TQIP）</td><td>0.631</td><td>手工 ISS 0.607</td></tr>
       <tr><td rowspan="2">CRASH-2（40 国出血创伤）</td><td>20,207</td><td>RTS</td><td>0.808</td><td>—</td></tr>
       <tr><td>20,207</td><td>SI</td><td>0.627</td><td>—</td></tr>
       <tr><td rowspan="2">UVA（美国一级创伤中心）</td><td>18,680</td><td>ISS</td><td>0.821</td><td>0.830</td></tr>
       <tr><td>18,680</td><td>NISS</td><td>0.817</td><td>0.827</td></tr></table>
       <p class="hint" style="font-size:13.5px">
       · 实现一致性：TRISS 与 CRAN traumar 1.2.7 比对 1000 组随机输入，最大差 2.2×10⁻¹⁶；ISS 重算与 TITCO 登记值一致 99.99%。<br>
+      · v3.2 床旁评分：GAP 在 TITCO 中与 RTS 相当（同一批病例 0.824 vs 0.822），且不需要呼吸频率，可计算病例多 40%。GAP 高/中/低危死亡率 TITCO 84.1/39.2/7.5%，CRASH-2 64.7/30.8/6.4%。rSIG ≤14.8 敏感度/特异度 TITCO 0.80/0.68。<br>
+      · ICD-10 估算（TITCO 13,292 例）：与手工 AIS-ISS Spearman 0.46，ISS≥16 一致性 κ=0.12；ICD 映射的死亡概率严重低估（预期 841 例，实际 2,723 例），故界面不显示。<br>
       · 校准警示：MTOS 系数在 TITCO 中预期死亡 383 例、实际 1479 例（Z=−67），显著低估死亡；在中国人群使用 Ps 须谨慎。<br>
       · 危险分级死亡率（红/橙/黄/绿）：TITCO 46.2/10.4/4.7/5.0%；CRASH-2 25.8/5.8/3.3/2.1%；UVA（仅 ISS）33.5/4.3/2.2/0.9%。红色对死亡的敏感度/特异度：TITCO 0.76/0.77。<br>
       · 数据来源：TITCO-I（CC BY 4.0，doi:10.5281/zenodo.7832819）；CRASH-2（Lancet 2010/2011，hbiostat.org 公开镜像）；UVA（Larkin 2022，CC BY 4.0，doi:10.6084/m9.figshare.19606138）；文献值：Roy N, Injury 2016;47:2459；Larkin, Injury 2022。<br>
@@ -211,6 +229,10 @@ footer{font-size:12px;color:var(--mut);text-align:center;padding:18px}
         <li>插管患者 GCS-V 推算：Meredith W, et al. J Trauma 1998：V = −0.3756 + 0.5713·M + 0.4233·E。</li>
         <li>AIS 版本等效界值：AIS 2005/2008 与 AIS 98 相比 ISS≥16 人数减少约 20–28%（Salottolo 2009；Palmer 2011）。</li>
         <li>休克指数 SI = HR/SBP；年龄休克指数 = 年龄×SI（Kim 2016 指出阈值 50 在老年人中可能过度分类）。</li>
+        <li>GAP：Kondo Y, et al. Crit Care 2011;15:R191（GCS + 年龄&lt;60 得 3 + SBP&gt;120 得 6、60–120 得 4；高危 3–10，中危 11–18，低危 19–24）。</li>
+        <li>MGAP：Sartorius D, et al. Crit Care Med 2010;38:831（GCS + 钝性 4 + 年龄&lt;60 得 5 + SBP&gt;120 得 5、60–120 得 3；高危 &lt;18，中危 18–22，低危 23–29）。</li>
+        <li>rSIG = SBP/HR × GCS：Kimura A, Tanaka N. BMC Emerg Med 2018（JTDB，界值 14.8）；Lee 2024（韩国 31.8 万例建议 16.5）。</li>
+        <li>ICD-10 估算 ISS：ICDPIC-R（icdpicr，Clark DE, Black AW；Injury 2021 v1.0.0）基础版 ICD-10 roc_max 映射表（MIT License, Copyright (c) 2020 David Clark, Adam Black）。</li>
         <li>TRISS 系数实现参考 bemts-hhs/traumar（MIT License, Copyright (c) bemts-hhs）。</li>
         <li>危险分级与操作提示依据：ATLS 11 版（xABCDE）；欧洲创伤大出血与凝血病指南第 6 版（Rossaint, Crit Care 2023）；创伤失血性休克中国急诊专家共识（2023）；ACS 现场分诊指南（2021）；ACS TQIP 大量输血指南（ABC 评分）；CRASH-2（氨甲环酸 3 小时窗口）；BTF 重型颅脑损伤指南第 4 版；Mutschler 2013（SI 分级）；Kim 2016（年龄休克指数）；T/CADERM 3036-2020（严重创伤定义）。复评间隔为本工具设定。</li>
         <li>本工具不内置任何 AIS 词典条目或代码（AIS © AAAM）；不联网、不保存任何数据。</li>
@@ -218,7 +240,7 @@ footer{font-size:12px;color:var(--mut);text-align:center;padding:18px}
     </details>
   </div>
 </main>
-<footer id="foot">创伤评分计算器 v3 · 离线单文件 · 仅供参考与教学</footer>
+<footer id="foot">创伤评分计算器 v3.2 · 离线单文件 · 仅供参考与教学</footer>
 
 <script>
 /*__CORE__*/
@@ -229,7 +251,7 @@ var $ = function(id){ return document.getElementById(id); };
 var TESTS = runSelfTests();
 var nPass = TESTS.filter(function(x){return x.pass;}).length;
 var TEST_OK = nPass === TESTS.length;
-$("foot").textContent = "创伤评分计算器 v3 · 离线单文件 · 自检通过 " + nPass + "/" + TESTS.length + " · 仅供参考与教学";
+$("foot").textContent = "创伤评分计算器 v3.2 · 离线单文件 · 自检通过 " + nPass + "/" + TESTS.length + " · 仅供参考与教学";
 if (!TEST_OK) {
   $("selftest").innerHTML = '<div class="bad">自检未通过（' + nPass + '/' + TESTS.length + '），结果已停用：<br>' +
     TESTS.filter(function(x){return !x.pass;}).map(function(x){return x.name + "：得 " + x.got + "，应为 " + x.exp;}).join("<br>") + '</div>';
@@ -279,6 +301,7 @@ $("modeSeg").addEventListener("click", function(e){
   $("physCard").classList.toggle("hidden", m!=="clin");
   $("trissCard").classList.toggle("hidden", m!=="clin");
   $("extraCard").classList.toggle("hidden", m!=="clin");
+  $("icdCard").classList.toggle("hidden", m!=="clin");
   $("lesson").classList.toggle("hidden", m!=="teach");
   $("lessonTip").classList.toggle("hidden", m==="teach");
   update();
@@ -289,7 +312,7 @@ $("mechSeg").addEventListener("click", function(e){
   update();
 });
 $("intub").addEventListener("change", function(){ $("intubWay").classList.toggle("hidden", !this.checked); $("gV").disabled = this.checked; update(); });
-["aisVer","gE","gV","gM","intubWay","sbp","rr","hr","age","coefVer","peds","hours","fast","torsoPen","anticoag"].forEach(function(id){
+["aisVer","gE","gV","gM","intubWay","sbp","rr","hr","age","coefVer","peds","hours","fast","torsoPen","anticoag","icdIn","icdRef"].forEach(function(id){
   $(id).addEventListener("input", update); $(id).addEventListener("change", update);
 });
 
@@ -343,7 +366,7 @@ function update(){
     out += (Math.abs(d) <= 3 ? '<div class="okb">ISS 差值 '+d+'：合格（±3 分）</div>' : '<div class="bad">ISS 差值 '+d+'：需复核</div>');
     out += '<div class="steps">A：' + issSteps(A) + '\n\nB：' + issSteps(B) + '</div>';
     if (A.hasAIS9 || B.hasAIS9) warns.push("存在 AIS 9（不详），ISS 可能低估。");
-    lastCopy = "教学对比：A ISS="+A.iss+"/NISS="+A.niss+"；B ISS="+B.iss+"/NISS="+B.niss+"；ISS 差值="+d+"（"+(Math.abs(d)<=3?"合格":"需复核")+"）；AIS 版本："+(aisVer||"未选")+"；工具版本 v3；计算时间："+new Date().toLocaleString("zh-CN");
+    lastCopy = "教学对比：A ISS="+A.iss+"/NISS="+A.niss+"；B ISS="+B.iss+"/NISS="+B.niss+"；ISS 差值="+d+"（"+(Math.abs(d)<=3?"合格":"需复核")+"）；AIS 版本："+(aisVer||"未选")+"；工具版本 v3.2；计算时间："+new Date().toLocaleString("zh-CN");
     $("resBody").innerHTML = warns.map(function(w){return '<div class="warn">'+w+'</div>';}).join("") + out;
     return;
   }
@@ -366,6 +389,14 @@ function update(){
   var ageOK = age !== null && !isNaN(age) && age >= 0 && age <= 120;
   if (rtsRes && ageOK && res.nValid > 0 && res.iss > 0) tr = calcTRISS(rtsRes.rts, res.iss, age, state.mech, $("coefVer").value, $("peds").checked);
   if (hr !== null && sbp !== null && !errs.length) si = calcSI(hr, sbp, ageOK ? age : -1);
+  var gapR = null, mgapR = null, rsigR = null;
+  if (gcs !== null && sbp !== null && !errs.length) {
+    if (ageOK) { gapR = calcGAP(gcs, age, sbp); mgapR = calcMGAP(gcs, age, sbp, state.mech); }
+    if (hr !== null && hr > 0) rsigR = calcRSIG(gcs, sbp, hr);
+  }
+  var icdCodes = $("icdIn").value.split(/[\s,，;；、]+/).filter(function(x){return x;});
+  var icdR = icdCodes.length ? calcICDISS(icdCodes, $("icdRef").value) : null;
+  var icdCmp = icdR ? compareICD(icdR, res) : null;
 
   if (ageOK && age < 15) warns.push("年龄 <15 岁：RTS 的 RR 区间不适用于幼儿，结果需谨慎解读。");
   if (ageOK && age >= 55) warns.push("年龄 ≥55 岁：TRISS 在老年人中常高估生存概率。");
@@ -406,9 +437,25 @@ function update(){
     '<div><b>'+(rtsRes?rtsRes.trts:"—")+'</b><span>T-RTS（分诊，0–12）</span></div>' +
     '<div><b>'+(tr?(tr.ps*100).toFixed(1)+"%":"—")+'</b><span>TRISS 预测生存概率</span></div>' +
     '<div><b>'+(si?si.si.toFixed(2):"—")+'</b><span>休克指数 SI'+(si&&si.si>=1?" ≥1.0":"")+'</span></div>' +
+    '<div><b>'+(gapR?gapR.score:"—")+'</b><span>GAP · '+(gapR?gapR.riskName:"需 GCS/年龄/SBP")+'</span></div>' +
+    '<div><b>'+(mgapR?mgapR.score:"—")+'</b><span>MGAP · '+(mgapR?mgapR.riskName:"需 GCS/年龄/SBP")+'</span></div>' +
+    '<div><b>'+(rsigR?rsigR.score.toFixed(1):"—")+'</b><span>rSIG'+(rsigR?(rsigR.high?" ≤14.8 风险升高":" >14.8"):" · 需 GCS/SBP/HR")+'</span></div>' +
     '</div>';
+  out += '<p class="hint">GAP、MGAP、rSIG 只用床旁生理指标，无需 AIS 和呼吸频率，适合到院早期；分数越低风险越高。</p>';
   out += '<p class="hint">ISS 分层：1–8 轻度，9–15 中度，16–24 重度，≥25 极重度；ISS ≥16 为 AIS 98 时代常用“严重创伤”界值。不同 AIS 版本等效界值不同（文献报道 AIS 2008 约 ISS &gt;12、AIS 2015 约 ISS ≥12 与之相当），不同版本 ISS 不可直接比较；不同文献界值略有差异。</p>';
   out += bars(res);
+  if (icdR) {
+    var ib = '<h3 style="font-size:15px;margin:14px 0 6px">ICD-10 交叉核对 <span class="hint">（'+icdR.ref+' 参考库，实验性）</span></h3>';
+    if (icdR.n) {
+      ib += '<table><tr><th>编码</th><th>区域</th><th>估算严重度</th></tr>' + icdR.items.map(function(it){ return '<tr><td>'+esc(it.raw)+(it.raw.replace(/[.\s]/g,"").toUpperCase()!==it.code?' → '+it.code:'')+'</td><td>'+REGION_SHORT[it.region]+'</td><td>'+it.ais+'</td></tr>'; }).join("") + '</table>';
+      ib += '<div class="big" style="margin-top:8px"><div><b>'+icdR.iss+'</b><span>ICD 估算 ISS</span></div><div><b>'+icdR.niss+'</b><span>ICD 估算 NISS</span></div><div><b>'+(res.nValid>0?res.iss:"—")+'</b><span>手工 AIS 的 ISS</span></div></div>';
+      if (icdCmp) ib += icdCmp.review ? '<div class="warn">建议复核：'+icdCmp.why.join("；")+'。请对照 AIS 手册检查是否漏录损伤或分级偏差。</div>' : '<div class="okb">与手工 AIS 评分基本一致（ISS 差 '+icdCmp.diff+'）。</div>';
+      else ib += '<p class="hint">录入损伤后可与手工 AIS 评分对比。</p>';
+    }
+    if (icdR.bad.length) ib += '<p class="hint">未能映射：'+icdR.bad.map(esc).join("、")+'（非 S/T 损伤编码、部位未特指编码或未收录）。</p>';
+    ib += '<p class="hint">TITCO-I 检验：ICD 估算 ISS 与手工 AIS-ISS 相关性中等（Spearman 0.46），中位数偏高 4 分，约 27% 病例差值 ≥9。只作提示，以手工 AIS 为准。</p>';
+    out += ib;
+  }
 
   var st = issSteps(res);
   if (rtsRes) st += "\n\nRTS 编码：GCS " + gcs + "→" + rtsRes.gc + "，SBP " + sbp + "→" + rtsRes.sc + "，RR " + rr + "→" + rtsRes.rc +
@@ -420,6 +467,9 @@ function update(){
   else if (rtsRes && res.iss === 0) st += "\n\nISS=0，不计算 Ps。";
   else if (!tr) st += "\n\nTRISS 需要：完整 GCS、SBP、RR、年龄和至少一处损伤。";
   if (si) st += "\n\nSI = " + hr + "/" + sbp + " = " + si.si.toFixed(2) + (si.ageSI!==null ? "；年龄休克指数 = " + age + "×" + si.si.toFixed(2) + " = " + si.ageSI.toFixed(1) + (si.ageSI>=50?"（≥50；老年人中可能过度分类）":"") : "");
+  if (gapR) st += "\n\nGAP = GCS " + gcs + " + 年龄" + (age<60?"<60 → 3":"≥60 → 0") + " + SBP " + sbp + (sbp>120?" → 6":sbp>=60?" → 4":" → 0") + " = " + gapR.score + "（" + gapR.riskName + "）";
+  if (mgapR) st += "\nMGAP = GCS " + gcs + " + " + (state.mech==="blunt"?"钝性 4":"穿透 0") + " + 年龄" + (age<60?"<60 → 5":"≥60 → 0") + " + SBP " + sbp + (sbp>120?" → 5":sbp>=60?" → 3":" → 0") + " = " + mgapR.score + "（" + mgapR.riskName + "）";
+  if (rsigR) st += "\nrSIG = SBP/HR × GCS = " + sbp + "/" + hr + " × " + gcs + " = " + rsigR.score.toFixed(1);
   out += '<h3 style="font-size:15px;margin:12px 0 6px">计算过程</h3><div class="steps">' + esc(st) + '</div>';
   out += '<p class="hint">TRISS 不适用于烧伤、窒息、溺水；Ps 为预测生存概率，不代表个体“应存活/应死亡”。</p>';
 
@@ -430,7 +480,7 @@ function update(){
     "；RTS=" + (rtsRes ? rtsRes.rts.toFixed(4) + "（GCS E" + gE + "V" + (vUsed!==null?vUsed+(intub?"*":""):"?") + "M" + gM + "=" + gcs + ", SBP " + sbp + ", RR " + rr + "）" : "未计算") +
     "；T-RTS=" + (rtsRes ? rtsRes.trts : "—") +
     "；TRISS Ps=" + (tr ? (tr.ps*100).toFixed(1) + "%（" + ($("coefVer").value==="mtos1995"?"MTOS 1995":"Boyd 1987") + "，" + (tr.usedMech==="blunt"?"钝性":"穿透") + "，年龄指数 " + tr.ageIndex + "）" : "未计算") +
-    "；SI=" + (si ? si.si.toFixed(2) : "—") + "；危险分级：" + tier.name + "（" + tier.reasons.join("、") + "）" + "；首要操作：" + (acts[0] ? acts[0].title : "—") + "；标记：" + flags + "；工具版本 v3；计算时间：" + new Date().toLocaleString("zh-CN");
+    "；SI=" + (si ? si.si.toFixed(2) : "—") + "；GAP=" + (gapR ? gapR.score : "—") + "；MGAP=" + (mgapR ? mgapR.score : "—") + "；rSIG=" + (rsigR ? rsigR.score.toFixed(1) : "—") + (icdR && icdR.n ? "；ICD 估算 ISS=" + icdR.iss + "（" + icdR.ref + "）" : "") + "；危险分级：" + tier.name + "（" + tier.reasons.join("、") + "）" + "；首要操作：" + (acts[0] ? acts[0].title : "—") + "；标记：" + flags + "；工具版本 v3.2；计算时间：" + new Date().toLocaleString("zh-CN");
 }
 
 $("btnCopy").addEventListener("click", function(){
